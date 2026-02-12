@@ -3,7 +3,8 @@ package com.example.verson1;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.widget.Button;
@@ -16,7 +17,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.regex.Pattern;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -26,8 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     private ProgressBar loadingIndicator;
     private TextView createProfileText;
 
-    private static final String DUMMY_EMAIL = "employer@shiftsync.com";
-    private static final String DUMMY_PASSWORD = "Employer@123";
+    private static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +55,7 @@ public class LoginActivity extends AppCompatActivity {
         fadeIn.setDuration(1000);
         rootView.startAnimation(fadeIn);
 
-        loginButton.setOnClickListener(v -> attemptLogin());
+        loginButton.setOnClickListener(v -> performLogin());
 
         createProfileText.setOnClickListener(v -> {
             Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
@@ -57,73 +64,85 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    private void attemptLogin() {
+    private void performLogin() {
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
 
-        boolean isValid = true;
-
-        if (TextUtils.isEmpty(email)) {
-            emailLayout.setError("Email is required");
-            isValid = false;
-        } else if (!validateEmail(email)) {
-            emailLayout.setError("Invalid email format");
-            isValid = false;
-        } else {
-            emailLayout.setError(null);
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Email and password are required", Toast.LENGTH_SHORT).show();
+            return;
         }
 
-        if (TextUtils.isEmpty(password)) {
-            passwordLayout.setError("Password is required");
-            isValid = false;
-        } else if (!validatePassword(password)) {
-            passwordLayout.setError("Password does not meet requirements");
-            isValid = false;
-        } else {
-            passwordLayout.setError(null);
-        }
-
-        if (isValid) {
-            performLogin(email, password);
-        }
-    }
-
-    private boolean validateEmail(String email) {
-        // - Contains “@”
-        // - Does not start with a number
-        // - Has characters before “@”
-        // - Ends with “.com”
-        String emailPattern = "^[^0-9][a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.com$";
-        return Pattern.compile(emailPattern).matcher(email).matches();
-    }
-
-    private boolean validatePassword(String password) {
-        // - Minimum 8 characters
-        // - At least one uppercase letter
-        // - At least one lowercase letter
-        // - At least one digit
-        // - At least one special character
-        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{8,}$";
-        return Pattern.compile(passwordPattern).matcher(password).matches();
-    }
-
-    private void performLogin(String email, String password) {
         loginButton.setEnabled(false);
         loadingIndicator.setVisibility(View.VISIBLE);
 
-        new Handler().postDelayed(() -> {
-            loadingIndicator.setVisibility(View.GONE);
-            loginButton.setEnabled(true);
+        new Thread(() -> {
+            HttpURLConnection con = null;
+            try {
+                URL url = new URL("http://10.0.2.2:3000/api/users/login");
+                con = (HttpURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                con.setDoOutput(true);
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
 
-            if (email.equals(DUMMY_EMAIL) && password.equals(DUMMY_PASSWORD)) {
-                Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                // Navigate to EmployerDashboardActivity (assuming it exists or will be created)
-                Intent intent = new Intent(LoginActivity.this, EmployerDashboardActivity.class);
-                startActivity(intent);
-                finish();
-            } else {
-                Toast.makeText(LoginActivity.this, "Invalid Credentials", Toast.LENGTH_SHORT).show();
+                // Create JSON payload
+                JSONObject jsonPayload = new JSONObject();
+                jsonPayload.put("email", email);
+                jsonPayload.put("password", password);
+
+                OutputStream os = con.getOutputStream();
+                os.write(jsonPayload.toString().getBytes());
+                os.flush();
+                os.close();
+
+                int responseCode = con.getResponseCode();
+                Log.d(TAG, "Login - Response Code: " + responseCode);
+
+                InputStream inputStream = (responseCode >= 200 && responseCode < 300) 
+                        ? con.getInputStream() : con.getErrorStream();
+
+                BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
+                StringBuilder res = new StringBuilder();
+                String line;
+                while ((line = br.readLine()) != null) res.append(line);
+                br.close();
+
+                final String result = res.toString();
+                Log.d(TAG, "Login - Server Response: " + result);
+
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    loadingIndicator.setVisibility(View.GONE);
+                    loginButton.setEnabled(true);
+                    
+                    try {
+                        JSONObject responseJson = new JSONObject(result);
+                        String message = responseJson.optString("message", "Unknown response");
+                        
+                        if (responseCode == 200) {
+                            Toast.makeText(LoginActivity.this, "Login Successful: " + message, Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(LoginActivity.this, EmployerDashboardActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Toast.makeText(LoginActivity.this, "Login Failed: " + message, Toast.LENGTH_LONG).show();
+                        }
+                    } catch (Exception e) {
+                        Toast.makeText(LoginActivity.this, "Error parsing response", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            } catch (Exception e) {
+                Log.e(TAG, "Login - Error: " + e.getMessage());
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    loadingIndicator.setVisibility(View.GONE);
+                    loginButton.setEnabled(true);
+                    Toast.makeText(LoginActivity.this, "Connection Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            } finally {
+                if (con != null) con.disconnect();
             }
-        }, 1000);
+        }).start();
     }
 }
