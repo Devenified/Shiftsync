@@ -1,6 +1,8 @@
 package com.example.verson1;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -26,17 +28,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private TextInputEditText nameET, emailET, phoneET, companyET, passwordET, confirmPasswordET;
     private TextInputLayout nameLayout, emailLayout, phoneLayout, companyLayout, passwordLayout, confirmPasswordLayout;
     private Button registerButton;
-    private TextView backToLoginText;
-    private ProgressBar loadingIndicator;
-
     private static final String TAG = "RegisterActivity";
+    private static final String PREFS_NAME = "ShiftSyncPrefs";
+    private static final String TOKEN_KEY = "auth_token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +58,7 @@ public class RegisterActivity extends AppCompatActivity {
         confirmPasswordLayout = findViewById(R.id.confirm_password_layout);
 
         registerButton = findViewById(R.id.register_button);
-        backToLoginText = findViewById(R.id.back_to_login_text);
-        
-        // Add a progress bar to the layout if it doesn't exist, or use a generic one
-        // For now, I'll assume you might want to add one to the XML later, 
-        // but I will just use the button state for feedback.
+        TextView backToLoginText = findViewById(R.id.back_to_login_text);
 
         // Fade-in animation
         View rootView = findViewById(R.id.register_root);
@@ -79,6 +75,9 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void attemptRegister() {
+        if (nameET.getText() == null || emailET.getText() == null || phoneET.getText() == null || 
+            companyET.getText() == null || passwordET.getText() == null || confirmPasswordET.getText() == null) return;
+
         String name = nameET.getText().toString().trim();
         String email = emailET.getText().toString().trim();
         String phone = phoneET.getText().toString().trim();
@@ -155,6 +154,7 @@ public class RegisterActivity extends AppCompatActivity {
                 jsonPayload.put("phoneNumber", phone);
                 jsonPayload.put("companyName", company);
                 jsonPayload.put("password", password);
+                jsonPayload.put("hasProfile", true);
 
                 OutputStream os = con.getOutputStream();
                 os.write(jsonPayload.toString().getBytes());
@@ -181,11 +181,16 @@ public class RegisterActivity extends AppCompatActivity {
                         String message = responseJson.optString("message", "Response received");
                         
                         if (responseCode == 201) {
-                            Toast.makeText(RegisterActivity.this, "Success: " + message, Toast.LENGTH_LONG).show();
-                            // Redirect to Login
+                            String token = responseJson.optString("token");
+                            saveToken(token);
+                            Toast.makeText(RegisterActivity.this, "Signup Successful", Toast.LENGTH_SHORT).show();
+                            
+                            // Go to dashboard or login
+                            Intent intent = new Intent(RegisterActivity.this, EmployerDashboardActivity.class);
+                            startActivity(intent);
                             finish();
                         } else {
-                            Toast.makeText(RegisterActivity.this, "Error: " + message, Toast.LENGTH_LONG).show();
+                            Toast.makeText(RegisterActivity.this, "Signup Failed: " + message, Toast.LENGTH_LONG).show();
                         }
                     } catch (Exception e) {
                         Toast.makeText(RegisterActivity.this, "Error parsing signup response", Toast.LENGTH_SHORT).show();
@@ -202,5 +207,11 @@ public class RegisterActivity extends AppCompatActivity {
                 if (con != null) con.disconnect();
             }
         }).start();
+    }
+
+    private void saveToken(String token) {
+        if (token == null || token.isEmpty()) return;
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putString(TOKEN_KEY, token).apply();
     }
 }

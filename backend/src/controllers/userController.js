@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 
 const User = require('../models/User');
+const { generateToken } = require('../lib/jwt');
 
 // POST /api/users/signup
 exports.signup = async (req, res) => {
@@ -27,8 +28,11 @@ exports.signup = async (req, res) => {
       hasProfile: !!hasProfile
     });
 
+    const token = generateToken(user);
+
     return res.status(201).json({
       message: 'User created successfully',
+      token,
       user: {
         id: user._id,
         fullName: user.fullName,
@@ -63,8 +67,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    const token = generateToken(user);
+
     return res.json({
       message: 'Login successful',
+      token,
       user: {
         id: user._id,
         fullName: user.fullName,
@@ -76,6 +83,33 @@ exports.login = async (req, res) => {
     });
   } catch (err) {
     console.error('Login error', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// GET /api/users/me (protected)
+exports.getProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select(
+      '_id fullName email phoneNumber companyName hasProfile'
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.json({
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        companyName: user.companyName,
+        hasProfile: user.hasProfile
+      }
+    });
+  } catch (err) {
+    console.error('Get profile error', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
