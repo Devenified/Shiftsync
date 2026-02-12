@@ -1,18 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Brand Colors -->
+    <color name="brand_primary">#0F172A</color> <!-- Slate 900 -->
+    <color name="brand_secondary">#6366F1</color> <!-- Indigo 500 -->
+    <color name="brand_accent">#10B981</color> <!-- Emerald 500 -->
 
-    <!-- App Theme Colors -->
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#00BCD4</color>
+    <!-- Backgrounds -->
+    <color name="bg_surface">#FFFFFF</color>
+    <color name="bg_main">#F8FAFC</color> <!-- Slate 50 -->
 
-    <!-- UI Component Colors -->
-    <color name="soft_light_background">#F5F5F5</color>
+    <!-- Text Colors -->
+    <color name="text_high_emphasis">#1E293B</color> <!-- Slate 800 -->
+    <color name="text_medium_emphasis">#64748B</color> <!-- Slate 500 -->
+    <color name="text_low_emphasis">#94A3B8</color> <!-- Slate 400 -->
+    <color name="text_on_brand">#FFFFFF</color>
+
+    <!-- Support Colors -->
+    <color name="error_red">#EF4444</color>
+    <color name="success_green">#10B981</color>
+
+    <!-- Generic -->
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- UI Component Colors (Restored for linking) -->
     <color name="card_background">#FFFFFF</color>
-    <color name="text_primary">#212121</color>
-    <color name="text_secondary">#757575</color>
-    <color name="hint_text_color">#BDBDBD</color>
-    <color name="error_text_color">#D32F2F</color>
+    <color name="hint_text_color">#94A3B8</color>
+    <color name="soft_light_background">#F8FAFC</color>
+    <color name="text_primary">#1E293B</color>
+    <color name="text_secondary">#64748B</color>
+    <color name="error_text_color">#EF4444</color>
+
+    <!-- Legacy / Theme support -->
+    <color name="colorPrimary">#0F172A</color>
+    <color name="colorPrimaryDark">#020617</color>
+    <color name="colorAccent">#6366F1</color>
 </resources>
