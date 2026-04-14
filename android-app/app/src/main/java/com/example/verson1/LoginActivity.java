@@ -1,21 +1,18 @@
 package com.example.verson1;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
-import android.widget.Button;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
 import org.json.JSONObject;
@@ -30,69 +27,97 @@ import java.net.URL;
 public class LoginActivity extends AppCompatActivity {
 
     private TextInputEditText emailEditText, passwordEditText;
-    private Button loginButton;
+    private MaterialButton loginButton;
     private ProgressBar loadingIndicator;
+    private TabLayout loginTabs;
 
     private static final String TAG = "LoginActivity";
-    private static final String PREFS_NAME = "ShiftSyncPrefs";
-    private static final String TOKEN_KEY = "auth_token";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
 
-        emailEditText = findViewById(R.id.email_edit_text);
-        passwordEditText = findViewById(R.id.password_edit_text);
-        loginButton = findViewById(R.id.login_button);
-        loadingIndicator = findViewById(R.id.loading_indicator);
-        TextView createProfileText = findViewById(R.id.create_profile_text);
+        if (checkExistingSession()) return;
 
-        // Fade-in animation
-        View rootView = findViewById(R.id.login_root);
-        AlphaAnimation fadeIn = new AlphaAnimation(0.0f, 1.0f);
-        fadeIn.setDuration(1000);
-        rootView.startAnimation(fadeIn);
+        setContentView(R.layout.activity_login_premium);
+
+        emailEditText = findViewById(R.id.et_email);
+        passwordEditText = findViewById(R.id.et_password);
+        loginButton = findViewById(R.id.btn_login);
+        loadingIndicator = findViewById(R.id.progress_bar);
+        loginTabs = findViewById(R.id.login_tabs);
+
+        if (loginTabs != null) {
+            loginTabs.addTab(loginTabs.newTab().setText("Worker"));
+            loginTabs.addTab(loginTabs.newTab().setText("Employer"));
+        }
 
         loginButton.setOnClickListener(v -> performLogin());
 
-        createProfileText.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-            startActivity(intent);
-            overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+        findViewById(R.id.tv_sign_up).setOnClickListener(v -> {
+            startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
-
-        // Optional: Check if token already exists to auto-login
-        checkExistingToken();
     }
 
-    private void checkExistingToken() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        String token = prefs.getString(TOKEN_KEY, null);
-        if (token != null) {
-            // Token exists, could navigate to dashboard directly or verify it
-            Log.d(TAG, "Existing token found: " + token);
+    private boolean checkExistingSession() {
+        if (SessionManager.isLoggedIn(this)) {
+            navigateByRole(SessionManager.getRole(this));
+            return true;
         }
+        return false;
     }
 
     private void performLogin() {
         if (emailEditText.getText() == null || passwordEditText.getText() == null) return;
-        
+
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
+        boolean isWorker = loginTabs == null || loginTabs.getSelectedTabPosition() == 0;
 
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(this, "Email and password are required", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show();
             return;
         }
 
+        // For emulator testing - skip connection testing to isolate crash
+        // Uncomment the connection testing below once basic login works
+        /*
+        // Test connection first (run in background to prevent UI blocking)
+        new Thread(() -> {
+            String workingIP = ApiClient.findWorkingIP();
+            runOnUiThread(() -> {
+                if (workingIP == null) {
+                    Toast.makeText(this, "Connection error: Cannot reach server\n\nTried all IPs:\n• 10.0.2.2:3000\n• localhost:3000\n• 10.87.0.168:3000\n• 192.168.1.100:3000\n• 192.168.0.100:3000\n\nSolutions:\n• Check backend is running\n• Allow port 3000 in firewall\n• Ensure same Wi-Fi network", Toast.LENGTH_LONG).show();
+                    loginButton.setEnabled(true);
+                    loginButton.setText("LOGIN");
+                    return;
+                }
+                
+                // Show success message with working IP
+                Toast.makeText(this, "Connected to: " + workingIP, Toast.LENGTH_SHORT).show();
+                
+                // Proceed with login
+                proceedWithLogin(email, password, isWorker);
+            });
+        }).start();
+        */
+        
+        // Direct login for emulator testing
+        proceedWithLogin(email, password, isWorker);
+    }
+    
+    private void proceedWithLogin(String email, String password, boolean isWorker) {
+
+        // Show loading
         loginButton.setEnabled(false);
+        loginButton.setText("Connecting...");
         loadingIndicator.setVisibility(View.VISIBLE);
 
         new Thread(() -> {
             HttpURLConnection con = null;
             try {
-                URL url = new URL("http://10.0.2.2:3000/api/users/login");
+                String endpoint = isWorker ? "/api/users/login-worker" : "/api/users/login-employer";
+                URL url = new URL(ApiClient.BASE_URL + endpoint);
                 con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("POST");
                 con.setRequestProperty("Content-Type", "application/json");
@@ -100,7 +125,6 @@ public class LoginActivity extends AppCompatActivity {
                 con.setConnectTimeout(5000);
                 con.setReadTimeout(5000);
 
-                // Create JSON payload
                 JSONObject jsonPayload = new JSONObject();
                 jsonPayload.put("email", email);
                 jsonPayload.put("password", password);
@@ -111,8 +135,6 @@ public class LoginActivity extends AppCompatActivity {
                 os.close();
 
                 int responseCode = con.getResponseCode();
-                Log.d(TAG, "Login - Response Code: " + responseCode);
-
                 InputStream inputStream = (responseCode >= 200 && responseCode < 300) 
                         ? con.getInputStream() : con.getErrorStream();
 
@@ -123,38 +145,37 @@ public class LoginActivity extends AppCompatActivity {
                 br.close();
 
                 final String result = res.toString();
-                Log.d(TAG, "Login - Server Response: " + result);
-
+                
                 new Handler(Looper.getMainLooper()).post(() -> {
                     loadingIndicator.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
                     
                     try {
                         JSONObject responseJson = new JSONObject(result);
-                        String message = responseJson.optString("message", "Unknown response");
-                        
+                        String message = responseJson.optString("message", "");
+
                         if (responseCode == 200) {
-                            String token = responseJson.optString("token");
-                            saveToken(token);
-                            
-                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(LoginActivity.this, EmployerDashboardActivity.class);
-                            startActivity(intent);
-                            finish();
+                            String token = responseJson.getString("token");
+                            String role = responseJson.getJSONObject("user").getString("role");
+                            saveSession(token, role);
+                            navigateByRole(role);
+                        } else if (responseCode == 401) {
+                            Toast.makeText(this, "Invalid email/password", Toast.LENGTH_SHORT).show();
+                        } else if (responseCode == 403) {
+                            Toast.makeText(this, "Please use correct login type (" + (isWorker ? "worker" : "employer") + ")", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(LoginActivity.this, "Login Failed: " + message, Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, message.isEmpty() ? "Login failed" : message, Toast.LENGTH_SHORT).show();
                         }
                     } catch (Exception e) {
-                        Toast.makeText(LoginActivity.this, "Error parsing response", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Server error", Toast.LENGTH_SHORT).show();
                     }
                 });
 
             } catch (Exception e) {
-                Log.e(TAG, "Login - Error: " + e.getMessage());
                 new Handler(Looper.getMainLooper()).post(() -> {
                     loadingIndicator.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
-                    Toast.makeText(LoginActivity.this, "Connection Failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show();
                 });
             } finally {
                 if (con != null) con.disconnect();
@@ -162,10 +183,22 @@ public class LoginActivity extends AppCompatActivity {
         }).start();
     }
 
-    private void saveToken(String token) {
-        if (token == null || token.isEmpty()) return;
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        prefs.edit().putString(TOKEN_KEY, token).apply();
-        Log.d(TAG, "Token saved successfully");
+    private void saveSession(String token, String role) {
+        SessionManager.prefs(this)
+                .edit()
+                .putString(SessionManager.TOKEN_KEY, token)
+                .putString(SessionManager.ROLE_KEY, role)
+                .apply();
+    }
+
+    private void navigateByRole(String role) {
+        Intent intent;
+        if ("worker".equalsIgnoreCase(role)) {
+            intent = new Intent(this, WorkerDashboardNewActivity.class);
+        } else {
+            intent = new Intent(this, EmployerDashboardActivity.class);
+        }
+        startActivity(intent);
+        finish();
     }
 }

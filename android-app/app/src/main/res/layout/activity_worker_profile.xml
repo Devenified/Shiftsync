@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding_horizontal">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginBottom="16dp"
+            android:background="@color/brand_orange"
+            app:menu="@menu/menu_toolbar_sign_out"
+            app:navigationIconTint="#FFFFFF"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+            app:title="Digital Profile"
+            app:titleTextAppearance="@style/TextAppearance.ShiftSync.Toolbar"
+            app:titleTextColor="#FFFFFF" />
+
+        <!-- Skills -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Skills (comma separated)"
+            app:boxStrokeColor="@color/brand_orange"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp"
+            app:hintTextColor="@color/brand_orange">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/skills_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:padding="18dp"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Location -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Location"
+            app:boxStrokeColor="@color/brand_orange"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp"
+            app:hintTextColor="@color/brand_orange">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/location_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:padding="18dp"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Experience -->
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Years of Experience"
+            app:boxStrokeColor="@color/brand_orange"
+            app:boxBackgroundColor="#FFFFFF"
+            app:boxCornerRadiusBottomEnd="14dp"
+            app:boxCornerRadiusBottomStart="14dp"
+            app:boxCornerRadiusTopEnd="14dp"
+            app:boxCornerRadiusTopStart="14dp"
+            app:hintTextColor="@color/brand_orange">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/experience_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:padding="18dp"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Stats -->
+        <TextView
+            android:id="@+id/stats_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textColor="@color/text_medium"
+            android:textSize="@dimen/text_body"
+            android:lineSpacingExtra="4dp" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:indeterminateTint="@color/brand_orange"
+            android:visibility="gone" />
+
+        <!-- Save button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_save_profile"
+            style="@style/Widget.ShiftSync.Button.Primary"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_standard"
+            android:layout_marginTop="28dp"
+            android:text="Save Profile" />
+
+        <!-- Logout button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_logout"
+            style="@style/Widget.ShiftSync.Button.Logout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_standard"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="32dp"
+            android:text="@string/action_logout" />
+
+    </LinearLayout>
+</ScrollView>

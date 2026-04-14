@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    
+    <!-- Strava orange background -->
+    <path
+        android:fillColor="#FC4C02"
+        android:pathData="M50,50 m-50,0 a50,50 0,1,1 100,0 a50,50 0,1,1 -100,0"/>
+    
+    <!-- Running figure - Frame 3 (left leg forward) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M35,25 L35,28 L38,28 L38,25 Z M32,32 L35,32 L35,40 L38,40 L38,32 L41,32 L41,40 L44,40 L44,32 L47,32 L47,40 L50,40 L50,32 L53,32 L53,40 L56,40 L56,32 L59,32 L59,40 L59,45 L56,45 L56,50 L53,50 L53,45 L50,45 L50,50 L47,50 L47,45 L44,45 L44,50 L41,50 L41,45 L38,45 L38,50 L35,50 L35,45 L32,45 L32,40 L29,40 L29,32 Z"/>
+</vector>

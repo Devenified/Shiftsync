@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_main"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding_horizontal">
+
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:layout_marginBottom="16dp"
+            android:background="@color/brand_orange"
+            app:menu="@menu/menu_toolbar_sign_out"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="#FFFFFF"
+            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+            app:title="@string/action_account"
+            app:titleTextAppearance="@style/TextAppearance.ShiftSync.Toolbar"
+            app:titleTextColor="#FFFFFF" />
+
+        <!-- Section label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Profile Information"
+            android:textColor="@color/text_medium"
+            android:textSize="@dimen/text_caption"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Name -->
+        <TextView
+            android:id="@+id/name_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_title"
+            android:textStyle="bold" />
+
+        <!-- Company -->
+        <TextView
+            android:id="@+id/company_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:textColor="@color/brand_orange"
+            android:textSize="@dimen/text_subtitle" />
+
+        <!-- Email -->
+        <TextView
+            android:id="@+id/email_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:drawableStart="@android:drawable/ic_dialog_email"
+            android:drawablePadding="12dp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_body" />
+
+        <!-- Phone -->
+        <TextView
+            android:id="@+id/phone_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:drawableStart="@android:drawable/stat_sys_phone_call"
+            android:drawablePadding="12dp"
+            android:textColor="@color/text_primary"
+            android:textSize="@dimen/text_body" />
+
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:indeterminateTint="@color/brand_orange"
+            android:visibility="gone" />
+
+        <!-- Logout -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_logout"
+            style="@style/Widget.ShiftSync.Button.Logout"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height_standard"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="32dp"
+            android:text="@string/action_logout" />
+
+    </LinearLayout>
+</ScrollView>

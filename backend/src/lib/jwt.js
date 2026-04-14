@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'MAD_Project';
 const JWT_EXPIRES_IN = '7d';
@@ -32,8 +33,29 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
+const requireRole = (allowedRole) => {
+  return async (req, res, next) => {
+    try {
+      const user = await User.findById(req.user.id).select('role');
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      if (user.role !== allowedRole) {
+        return res.status(403).json({ message: 'Access denied for this role' });
+      }
+
+      return next();
+    } catch (err) {
+      console.error('Role check error', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+};
+
 module.exports = {
   generateToken,
-  authMiddleware
+  authMiddleware,
+  requireRole
 };
 
