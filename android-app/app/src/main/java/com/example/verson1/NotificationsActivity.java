@@ -1,5 +1,6 @@
 package com.example.verson1;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -102,14 +103,50 @@ public class NotificationsActivity extends AppCompatActivity {
     }
 
     private void onNotificationClick(NotificationItem item) {
-        if (item.read) return;
-        new Thread(() -> {
-            try {
-                ApiClient.patch("/api/notifications/" + item.id + "/read", token, "{}");
-            } catch (Exception ignored) { }
-        }).start();
-        item.read = true;
-        adapter.notifyDataSetChanged();
+        if (!item.read) {
+            new Thread(() -> {
+                try {
+                    ApiClient.patch("/api/notifications/" + item.id + "/read", token, "{}");
+                } catch (Exception ignored) { }
+            }).start();
+            item.read = true;
+            adapter.notifyDataSetChanged();
+        }
+        routeForNotification(item);
+    }
+
+    private void routeForNotification(NotificationItem item) {
+        String type = item.type == null ? "" : item.type;
+        boolean isEmployer = SessionManager.isEmployer(this);
+        Intent intent = null;
+        switch (type) {
+            case "shift_assignment":
+            case "shift_created":
+            case "shift_updated":
+            case "shift_cancelled":
+            case "shift_rejected":
+                intent = new Intent(this,
+                        isEmployer ? EmployerManageShiftsActivity.class
+                                   : WorkerMyShiftsActivity.class);
+                break;
+            case "leave_request":
+            case "leave_approved":
+            case "leave_rejected":
+                intent = new Intent(this, isEmployer
+                        ? RequestLeaveActivity.class
+                        : RequestLeaveActivity.class);
+                break;
+            case "swap_request":
+            case "swap_approved":
+            case "swap_rejected":
+                intent = new Intent(this, RequestSwapActivity.class);
+                break;
+            default:
+                return;
+        }
+        try {
+            startActivity(intent);
+        } catch (Exception ignored) { }
     }
 
     private void markAllAsRead() {

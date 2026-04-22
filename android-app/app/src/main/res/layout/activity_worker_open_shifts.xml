@@ -67,12 +67,122 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/results_count"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="6dp"
                     android:text="@string/worker_open_shifts_subtitle"
                     android:textColor="@color/text_secondary"
                     android:textSize="@dimen/text_body" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.ShiftSync.TextInputLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:hint="Search title, skill, location, employer"
+                    app:endIconMode="clear_text"
+                    app:startIconDrawable="@drawable/ic_search_modern">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/search_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:imeOptions="actionSearch"
+                        android:inputType="text"
+                        android:maxLines="1"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/filter_chips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:selectionRequired="true"
+                        app:singleLine="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_filter_all"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="All" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_filter_today"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Today" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_filter_week"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="This week" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_filter_not_applied"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Not applied" />
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
+
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:scrollbars="none">
+
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/sort_chips"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:selectionRequired="true"
+                        app:singleLine="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_sort_new"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:text="Newest" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_sort_wage_high"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Wage (high)" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_sort_wage_low"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Wage (low)" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_sort_soon"
+                            style="@style/Widget.ShiftSync.Chip"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Starting soon" />
+                    </com.google.android.material.chip.ChipGroup>
+                </HorizontalScrollView>
             </LinearLayout>
 
             <ProgressBar

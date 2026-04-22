@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -84,6 +86,26 @@ public class EmployerDashboardActivity extends AppCompatActivity {
             }
             return LogoutUiHelper.onMenuItemLogout(this, id);
         });
+
+        MenuItem bellItem = toolbar.getMenu().findItem(R.id.action_notifications);
+        if (bellItem != null) {
+            View actionView = bellItem.getActionView();
+            if (actionView != null) {
+                actionView.setOnClickListener(v ->
+                        startActivity(new Intent(this, NotificationsActivity.class)));
+            }
+        }
+    }
+
+    private void refreshNotificationBadge() {
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        if (toolbar == null) return;
+        MenuItem bellItem = toolbar.getMenu().findItem(R.id.action_notifications);
+        if (bellItem == null) return;
+        View actionView = bellItem.getActionView();
+        if (actionView == null) return;
+        TextView badge = actionView.findViewById(R.id.action_bell_badge);
+        NotificationBadgeHelper.refresh(this, badge);
     }
     
     private void setupClickListeners() {
@@ -115,6 +137,7 @@ public class EmployerDashboardActivity extends AppCompatActivity {
         fetchUserProfile();
         fetchEmployerDashboard();
         fetchActivityFeed();
+        refreshNotificationBadge();
     }
     
     private void setupBottomNav() {

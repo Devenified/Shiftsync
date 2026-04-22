@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:name=".ShiftSyncApp"
@@ -49,6 +51,7 @@
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".WorkerPublicProfileActivity" />
         <activity android:name=".WorkerEarningsActivity" />
+        <activity android:name=".LocationPickerActivity" />
         <activity
             android:name=".CrashScreenActivity"
             android:exported="false"

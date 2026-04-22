@@ -28,6 +28,7 @@ const shiftSchema = new mongoose.Schema(
     startTime: { type: String, required: true, trim: true },
     endTime: { type: String, required: true, trim: true },
     wage: { type: Number, required: true, min: 0 },
+    durationDays: { type: Number, default: 1, min: 1 },
     status: {
       type: String,
       enum: ['open', 'assigned', 'completed', 'cancelled'],

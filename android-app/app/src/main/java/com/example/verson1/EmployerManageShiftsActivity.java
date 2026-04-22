@@ -14,13 +14,11 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
-import com.google.android.material.snackbar.Snackbar;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,6 +40,8 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_employer_manage_shifts);
 
+        CrashReporter.install(this);
+
         if (!SessionManager.ensureEmployer(this)) {
             return;
         }
@@ -62,6 +62,7 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
         emptyText = findViewById(R.id.empty_text);
         swipeRefresh = findViewById(R.id.swipe_refresh);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setItemAnimator(null);
         adapter = new EmployerShiftAdapter();
         recyclerView.setAdapter(adapter);
 
@@ -78,13 +79,18 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
     }
 
     private void loadShifts() {
-        if (!swipeRefresh.isRefreshing()) {
+        loadShifts(true);
+    }
+
+    private void loadShifts(boolean showSpinner) {
+        if (showSpinner && !swipeRefresh.isRefreshing()) {
             progressBar.setVisibility(View.VISIBLE);
         }
         new Thread(() -> {
             try {
                 ApiClient.HttpResult res = ApiClient.get("/api/shifts/employer/my", token);
                 new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
                     progressBar.setVisibility(View.GONE);
                     swipeRefresh.setRefreshing(false);
                     if (res.code == 200) {
@@ -97,20 +103,28 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                             adapter.setItems(list);
                             updateEmptyState(list.isEmpty());
                         } catch (Exception e) {
-                            Toast.makeText(this, "Could not read shifts", Toast.LENGTH_SHORT).show();
+                            safeToast("Could not read shifts");
                         }
                     } else {
-                        Toast.makeText(this, "Failed to load shifts", Toast.LENGTH_SHORT).show();
+                        safeToast("Failed to load shifts");
                     }
                 });
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
                     progressBar.setVisibility(View.GONE);
                     swipeRefresh.setRefreshing(false);
-                    Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show();
+                    safeToast("Connection error");
                 });
             }
         }).start();
+    }
+
+    private void safeToast(String msg) {
+        try {
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        } catch (Exception ignored) {
+        }
     }
 
     private void updateEmptyState(boolean isEmpty) {
@@ -126,19 +140,33 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                 body.put("decision", decision);
                 ApiClient.HttpResult res = ApiClient.patch(path, token, body.toString());
                 new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
                     if (res.code == 200) {
-                        Snackbar.make(recyclerView, "Application " + decision, Snackbar.LENGTH_LONG)
-                                .setBackgroundTint(ContextCompat.getColor(this, R.color.status_available))
-                                .show();
-                        loadShifts();
+                        try {
+                            JSONObject respBody = new JSONObject(res.body);
+                            String newShiftStatus = respBody.optString("status", null);
+                            adapter.updateApplicationStatus(shiftId, workerId, decision, newShiftStatus);
+                        } catch (Exception ignored) {
+                            adapter.updateApplicationStatus(shiftId, workerId, decision, null);
+                        }
+                        safeToast("accepted".equals(decision)
+                                ? "Worker accepted - they've been notified"
+                                : "Worker rejected - they've been notified");
                     } else {
-                        Toast.makeText(this, "Could not update application", Toast.LENGTH_SHORT).show();
+                        String msg;
+                        try {
+                            msg = new JSONObject(res.body).optString("message", "Could not update application");
+                        } catch (Exception e) {
+                            msg = "Could not update application";
+                        }
+                        safeToast(msg);
                     }
                 });
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(
-                        () -> Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show()
-                );
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    safeToast("Connection error");
+                });
             }
         }).start();
     }
@@ -150,85 +178,127 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void confirmCompleteShift(String shiftId, String shiftTitle, int paidCount, double wage, int pending) {
+    private void confirmCompleteShift(String shiftId, String shiftTitle, int paidCount,
+                                      double wage, int days, int pending) {
+        int payoutPerWorker = (int) wage * Math.max(1, days);
         StringBuilder msg = new StringBuilder();
         msg.append("This will pay ").append(paidCount)
                 .append(paidCount == 1 ? " worker " : " workers ")
-                .append("\u20B9").append((int) wage).append(" each and close the shift.");
+                .append("\u20B9").append(payoutPerWorker).append(" each");
+        if (days > 1) {
+            msg.append(" (\u20B9").append((int) wage).append(" x ").append(days).append(" days)");
+        }
+        msg.append(" and close the shift.");
         if (pending > 0) {
             msg.append("\n\n").append(pending)
                     .append(pending == 1 ? " pending applicant " : " pending applicants ")
                     .append("will be auto-rejected.");
         }
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Complete \"" + shiftTitle + "\"?")
-                .setMessage(msg.toString())
-                .setPositiveButton("Mark Completed", (d, w) -> completeShift(shiftId))
-                .setNegativeButton("Not yet", null)
-                .show();
+        try {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Complete \"" + shiftTitle + "\"?")
+                    .setMessage(msg.toString())
+                    .setPositiveButton("Mark Completed", (d, w) -> {
+                        try { d.dismiss(); } catch (Exception ignored) {}
+                        completeShift(shiftId);
+                    })
+                    .setNegativeButton("Not yet", null)
+                    .show();
+        } catch (Exception e) {
+            completeShift(shiftId);
+        }
     }
 
     private void completeShift(String shiftId) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            try { adapter.setItemBusy(shiftId, true); } catch (Exception ignored) {}
+        });
         new Thread(() -> {
             try {
                 String path = "/api/shifts/" + shiftId + "/complete";
                 ApiClient.HttpResult res = ApiClient.patch(path, token, "{}");
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    if (res.code == 200) {
-                        Snackbar.make(recyclerView, "Shift marked as completed", Snackbar.LENGTH_LONG)
-                                .setBackgroundTint(ContextCompat.getColor(this, R.color.status_available))
-                                .show();
-                        loadShifts();
-                    } else {
-                        try {
-                            String msg = new JSONObject(res.body).optString("message", "Complete failed");
-                            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                        } catch (Exception e) {
-                            Toast.makeText(this, "Complete failed", Toast.LENGTH_SHORT).show();
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    try {
+                        adapter.setItemBusy(shiftId, false);
+                        if (res.code == 200) {
+                            adapter.updateItemStatus(shiftId, "completed");
+                            safeToast("Shift marked as completed");
+                        } else {
+                            String msg;
+                            try {
+                                msg = new JSONObject(res.body).optString("message", "Complete failed");
+                            } catch (Exception e) {
+                                msg = "Complete failed (" + res.code + ")";
+                            }
+                            safeToast(msg);
                         }
+                    } catch (Exception ignored) {
+                        safeToast("Shift marked as completed");
                     }
-                });
+                }, 50);
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(
-                        () -> Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show()
-                );
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    try { adapter.setItemBusy(shiftId, false); } catch (Exception ignored) {}
+                    safeToast("Connection error");
+                });
             }
         }).start();
     }
 
     private void confirmCancelShift(String shiftId, String shiftTitle) {
-        new MaterialAlertDialogBuilder(this)
-                .setTitle("Cancel Shift")
-                .setMessage("Are you sure you want to cancel \"" + shiftTitle + "\"? This action cannot be undone.")
-                .setPositiveButton("Cancel Shift", (d, w) -> cancelShift(shiftId))
-                .setNegativeButton("Keep", null)
-                .show();
+        try {
+            new MaterialAlertDialogBuilder(this)
+                    .setTitle("Cancel Shift")
+                    .setMessage("Are you sure you want to cancel \"" + shiftTitle + "\"? This action cannot be undone.")
+                    .setPositiveButton("Cancel Shift", (d, w) -> {
+                        try { d.dismiss(); } catch (Exception ignored) {}
+                        cancelShift(shiftId);
+                    })
+                    .setNegativeButton("Keep", null)
+                    .show();
+        } catch (Exception e) {
+            cancelShift(shiftId);
+        }
     }
 
     private void cancelShift(String shiftId) {
+        new Handler(Looper.getMainLooper()).post(() -> {
+            if (isFinishing() || isDestroyed()) return;
+            try { adapter.setItemBusy(shiftId, true); } catch (Exception ignored) {}
+        });
         new Thread(() -> {
             try {
                 String path = "/api/shifts/" + shiftId;
                 ApiClient.HttpResult res = ApiClient.delete(path, token);
-                new Handler(Looper.getMainLooper()).post(() -> {
-                    if (res.code == 200) {
-                        Snackbar.make(recyclerView, "Shift cancelled successfully", Snackbar.LENGTH_LONG)
-                                .setBackgroundTint(ContextCompat.getColor(this, R.color.status_available))
-                                .show();
-                        loadShifts();
-                    } else {
-                        try {
-                            String msg = new JSONObject(res.body).optString("message", "Cancel failed");
-                            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                        } catch (Exception e) {
-                            Toast.makeText(this, "Cancel failed", Toast.LENGTH_SHORT).show();
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    try {
+                        adapter.setItemBusy(shiftId, false);
+                        if (res.code == 200) {
+                            adapter.updateItemStatus(shiftId, "cancelled");
+                            safeToast("Shift cancelled");
+                        } else {
+                            String msg;
+                            try {
+                                msg = new JSONObject(res.body).optString("message", "Cancel failed");
+                            } catch (Exception e) {
+                                msg = "Cancel failed (" + res.code + ")";
+                            }
+                            safeToast(msg);
                         }
+                    } catch (Exception ignored) {
+                        safeToast("Shift cancelled");
                     }
-                });
+                }, 50);
             } catch (Exception e) {
-                new Handler(Looper.getMainLooper()).post(
-                        () -> Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show()
-                );
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    try { adapter.setItemBusy(shiftId, false); } catch (Exception ignored) {}
+                    safeToast("Connection error");
+                });
             }
         }).start();
     }
@@ -236,11 +306,88 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
     private class EmployerShiftAdapter extends RecyclerView.Adapter<EmployerShiftAdapter.VH> {
 
         private final List<JSONObject> items = new ArrayList<>();
+        private final java.util.Set<String> busyIds = new java.util.HashSet<>();
 
         void setItems(List<JSONObject> data) {
             items.clear();
             items.addAll(data);
-            notifyDataSetChanged();
+            try {
+                notifyDataSetChanged();
+            } catch (Exception ignored) {
+            }
+        }
+
+        int findIndex(String shiftId) {
+            if (shiftId == null) return -1;
+            for (int i = 0; i < items.size(); i++) {
+                if (shiftId.equals(JsonHelper.idString(items.get(i), "_id"))) return i;
+            }
+            return -1;
+        }
+
+        void updateItemStatus(String shiftId, String newStatus) {
+            int idx = findIndex(shiftId);
+            if (idx < 0) return;
+            try {
+                items.get(idx).put("status", newStatus);
+                notifyItemChanged(idx);
+            } catch (Exception ignored) {
+            }
+        }
+
+        void updateApplicationStatus(String shiftId, String workerId, String decision, String newShiftStatus) {
+            int idx = findIndex(shiftId);
+            if (idx < 0) return;
+            try {
+                JSONObject shift = items.get(idx);
+                JSONArray apps = shift.optJSONArray("applications");
+                if (apps != null) {
+                    int accepted = 0;
+                    for (int i = 0; i < apps.length(); i++) {
+                        JSONObject a = apps.optJSONObject(i);
+                        if (a == null) continue;
+                        JSONObject w = a.optJSONObject("worker");
+                        String wid = "";
+                        if (w != null) {
+                            wid = JsonHelper.idString(w, "_id");
+                            if (wid == null || wid.isEmpty()) wid = w.optString("_id", "");
+                        }
+                        if (workerId.equals(wid)) {
+                            a.put("status", decision);
+                        }
+                        // If we just accepted and the shift filled, auto-reject other pending
+                        if ("accepted".equals(a.optString("status"))) accepted++;
+                    }
+                    int needed = Math.max(1, shift.optInt("workersNeeded", 1));
+                    if ("accepted".equals(decision) && accepted >= needed) {
+                        for (int i = 0; i < apps.length(); i++) {
+                            JSONObject a = apps.optJSONObject(i);
+                            if (a != null && "pending".equals(a.optString("status"))) {
+                                a.put("status", "rejected");
+                            }
+                        }
+                    }
+                    shift.put("slotsFilled", accepted);
+                    shift.put("slotsRemaining", Math.max(0, needed - accepted));
+                }
+                if (newShiftStatus != null && !newShiftStatus.isEmpty()) {
+                    shift.put("status", newShiftStatus);
+                }
+                notifyItemChanged(idx);
+            } catch (Exception ignored) {
+            }
+        }
+
+        void setItemBusy(String shiftId, boolean busy) {
+            if (shiftId == null) return;
+            if (busy) busyIds.add(shiftId); else busyIds.remove(shiftId);
+            int idx = findIndex(shiftId);
+            if (idx >= 0) {
+                try {
+                    notifyItemChanged(idx);
+                } catch (Exception ignored) {
+                }
+            }
         }
 
         @NonNull
@@ -252,22 +399,62 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull VH holder, int position) {
+            try {
+                bindItem(holder, position);
+            } catch (Exception e) {
+                holder.title.setText("Shift");
+                holder.meta.setText("");
+                holder.wage.setText("");
+                holder.applicationsContainer.removeAllViews();
+                holder.complete.setVisibility(View.GONE);
+                holder.cancel.setVisibility(View.GONE);
+            }
+        }
+
+        private void bindItem(@NonNull VH holder, int position) {
             JSONObject shift = items.get(position);
             String shiftId = JsonHelper.idString(shift, "_id");
             String title = shift.optString("title", "Shift");
             holder.title.setText(title);
             String status = shift.optString("status", "");
+            if (holder.statusPill != null) {
+                try {
+                    holder.statusPill.setText(
+                            status.isEmpty() ? "" : status.toUpperCase());
+                    int pillBg;
+                    switch (status) {
+                        case "assigned":
+                            pillBg = R.drawable.bg_pill_warning;
+                            break;
+                        case "completed":
+                            pillBg = R.drawable.bg_pill_success;
+                            break;
+                        case "cancelled":
+                            pillBg = R.drawable.bg_pill_warning;
+                            break;
+                        case "open":
+                        default:
+                            pillBg = R.drawable.bg_pill_info;
+                            break;
+                    }
+                    holder.statusPill.setBackgroundResource(pillBg);
+                } catch (Exception ignored) {
+                }
+            }
             holder.meta.setText(
-                    status
-                            + " • "
-                            + shift.optString("skillRequired", "")
-                            + " • "
+                    shift.optString("skillRequired", "")
+                            + " \u2022 "
                             + shift.optString("location", "")
-                            + " • "
+                            + " \u2022 "
                             + shift.optString("shiftDate", "")
             );
             double wage = shift.optDouble("wage", 0);
-            holder.wage.setText("\u20B9" + (int) wage);
+            int durationDays = Math.max(1, shift.optInt("durationDays", 1));
+            if (durationDays > 1) {
+                holder.wage.setText("\u20B9" + (int) wage + " / day \u00B7 " + durationDays + " days");
+            } else {
+                holder.wage.setText("\u20B9" + (int) wage + " / day");
+            }
 
             int workersNeeded = Math.max(1, shift.optInt("workersNeeded", 1));
             int slotsFilled = shift.optInt("slotsFilled", -1);
@@ -403,8 +590,8 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                 }
             }
 
-            // Complete button: allowed for assigned, or for open shifts that already
-            // have at least one accepted worker (multi-worker partial-fill early end).
+            boolean isBusy = busyIds.contains(shiftId);
+
             boolean showComplete = "assigned".equals(status)
                     || ("open".equals(status) && slotsFilled > 0);
             holder.complete.setVisibility(showComplete ? View.VISIBLE : View.GONE);
@@ -414,20 +601,31 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                 final String finalShiftIdForComplete = shiftId;
                 final String finalTitle = title;
                 final double finalWage = wage;
-                if ("open".equals(status) && slotsFilled < workersNeeded) {
+                if (isBusy) {
+                    holder.complete.setText("Working...");
+                } else if ("open".equals(status) && slotsFilled < workersNeeded) {
                     holder.complete.setText("End Early (" + finalFilled + "/" + workersNeeded + ")");
                 } else {
                     holder.complete.setText("Complete Shift");
                 }
-                holder.complete.setOnClickListener(v -> confirmCompleteShift(
-                        finalShiftIdForComplete, finalTitle, finalFilled, finalWage, finalPending));
+                holder.complete.setEnabled(!isBusy);
+                final int finalDays = durationDays;
+                holder.complete.setOnClickListener(v -> {
+                    if (busyIds.contains(finalShiftIdForComplete)) return;
+                    confirmCompleteShift(
+                            finalShiftIdForComplete, finalTitle, finalFilled, finalWage, finalDays, finalPending);
+                });
             }
 
-            // Show cancel button for open or assigned shifts
             boolean showCancel = "open".equals(status) || "assigned".equals(status);
             holder.cancel.setVisibility(showCancel ? View.VISIBLE : View.GONE);
             if (showCancel) {
-                holder.cancel.setOnClickListener(v -> confirmCancelShift(shiftId, title));
+                holder.cancel.setEnabled(!isBusy);
+                holder.cancel.setText(isBusy ? "Working..." : "Cancel Shift");
+                holder.cancel.setOnClickListener(v -> {
+                    if (busyIds.contains(shiftId)) return;
+                    confirmCancelShift(shiftId, title);
+                });
             }
         }
 
@@ -440,6 +638,7 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
             final TextView title;
             final TextView meta;
             final TextView wage;
+            final TextView statusPill;
             final TextView applicantCountLabel;
             final TextView slotProgressLabel;
             final LinearLayout applicationsContainer;
@@ -449,6 +648,7 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
             VH(@NonNull View itemView) {
                 super(itemView);
                 title = itemView.findViewById(R.id.title);
+                statusPill = itemView.findViewById(R.id.status_pill);
                 meta = itemView.findViewById(R.id.meta);
                 wage = itemView.findViewById(R.id.wage);
                 applicantCountLabel = itemView.findViewById(R.id.applicant_count_label);

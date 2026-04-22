@@ -39,7 +39,7 @@
                 android:id="@+id/tv_wage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="$15/hour"
+                android:text="₹600/day"
                 android:textColor="@color/status_success"
                 android:textSize="14sp"
                 android:textStyle="bold" />

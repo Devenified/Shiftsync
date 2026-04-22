@@ -3,10 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_notifications"
-        android:icon="@drawable/ic_bell_modern"
-        android:iconTint="#FFFFFF"
         android:title="Notifications"
-        app:showAsAction="ifRoom" />
+        app:actionLayout="@layout/action_bell_badge"
+        app:showAsAction="always" />
     <item
         android:id="@+id/action_account"
         android:title="@string/action_account"

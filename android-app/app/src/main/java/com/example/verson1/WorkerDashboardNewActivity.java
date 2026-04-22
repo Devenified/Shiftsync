@@ -313,5 +313,11 @@ public class WorkerDashboardNewActivity extends AppCompatActivity {
             return;
         }
         fetchUserData();
+        refreshNotificationBadge();
+    }
+
+    private void refreshNotificationBadge() {
+        TextView badge = findViewById(R.id.notification_badge);
+        NotificationBadgeHelper.refresh(this, badge);
     }
 }

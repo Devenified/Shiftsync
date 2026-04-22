@@ -178,7 +178,9 @@ public class WorkerEarningsActivity extends AppCompatActivity {
             }
             h.meta.setText(meta.toString());
             int wage = (int) s.optDouble("wage", 0);
-            h.amount.setText(String.format(Locale.getDefault(), "+\u20B9%d", wage));
+            int days = Math.max(1, s.optInt("durationDays", 1));
+            int total = wage * days;
+            h.amount.setText(String.format(Locale.getDefault(), "+\u20B9%d", total));
         }
 
         @Override

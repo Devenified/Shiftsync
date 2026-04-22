@@ -195,11 +195,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Hourly Wage ($)"
+                android:hint="Wage per day (₹)"
                 app:boxBackgroundColor="@color/card_background"
                 app:boxStrokeColor="@color/brand_primary"
                 app:hintTextColor="@color/text_secondary"
-                app:prefixText="$">
+                app:prefixText="₹">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/et_wage"

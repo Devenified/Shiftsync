@@ -114,32 +114,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Location"
+                android:hint="Location (tap to pick on map)"
+                app:endIconDrawable="@drawable/ic_location_modern"
+                app:endIconMode="custom"
                 app:startIconDrawable="@drawable/ic_location_modern">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/location_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="false"
+                    android:longClickable="false"
                     android:textColor="@color/text_primary" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.ShiftSync.TextInputLayout"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Date (tap to select)"
-                app:startIconDrawable="@drawable/ic_calendar_modern">
+                android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/date_input"
-                    android:layout_width="match_parent"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.ShiftSync.TextInputLayout"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:focusable="false"
-                    android:clickable="true"
-                    android:textColor="@color/text_primary" />
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:hint="Start date"
+                    app:startIconDrawable="@drawable/ic_calendar_modern">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/date_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:longClickable="false"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.ShiftSync.TextInputLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="Days"
+                    app:startIconDrawable="@drawable/ic_calendar_modern">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/duration_days_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="number"
+                        android:text="1"
+                        android:textColor="@color/text_primary" />
+                </com.google.android.material.textfield.TextInputLayout>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -197,7 +228,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:hint="Wage per worker (₹)"
+                    android:hint="Wage per day (₹)"
                     app:startIconDrawable="@drawable/ic_money_modern">
 
                     <com.google.android.material.textfield.TextInputEditText

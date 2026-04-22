@@ -1,28 +1,51 @@
 package com.example.verson1;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
-import java.util.Calendar;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointForward;
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import org.json.JSONObject;
 
-public class EmployerPostShiftActivity extends AppCompatActivity {
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
-    private static final String PREFS_NAME = "ShiftSyncPrefs";
-    private static final String TOKEN_KEY = "auth_token";
+public class EmployerPostShiftActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
     private String token;
+
+    private TextInputEditText titleInput;
+    private TextInputEditText descInput;
+    private TextInputEditText skillInput;
+    private TextInputEditText locationInput;
+    private TextInputEditText dateInput;
+    private TextInputEditText startInput;
+    private TextInputEditText endInput;
+    private TextInputEditText wageInput;
+    private TextInputEditText workersNeededInput;
+    private TextInputEditText durationDaysInput;
+
+    private ActivityResultLauncher<Intent> locationPickerLauncher;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,107 +69,124 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
         }
         progressBar = findViewById(R.id.progress);
 
-        TextInputEditText title = findViewById(R.id.title_input);
-        TextInputEditText desc = findViewById(R.id.desc_input);
-        TextInputEditText skill = findViewById(R.id.skill_input);
-        TextInputEditText location = findViewById(R.id.location_input);
-        TextInputEditText date = findViewById(R.id.date_input);
-        TextInputEditText start = findViewById(R.id.start_input);
-        TextInputEditText end = findViewById(R.id.end_input);
-        TextInputEditText wage = findViewById(R.id.wage_input);
-        TextInputEditText workersNeeded = findViewById(R.id.workers_needed_input);
+        titleInput = findViewById(R.id.title_input);
+        descInput = findViewById(R.id.desc_input);
+        skillInput = findViewById(R.id.skill_input);
+        locationInput = findViewById(R.id.location_input);
+        dateInput = findViewById(R.id.date_input);
+        startInput = findViewById(R.id.start_input);
+        endInput = findViewById(R.id.end_input);
+        wageInput = findViewById(R.id.wage_input);
+        workersNeededInput = findViewById(R.id.workers_needed_input);
+        durationDaysInput = findViewById(R.id.duration_days_input);
 
-        date.setOnClickListener(v -> {
-            Calendar c = Calendar.getInstance();
-            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
-                String d = String.format("%04d-%02d-%02d", year, month + 1, dayOfMonth);
-                date.setText(d);
-            }, c.get(Calendar.YEAR), c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH)).show();
-        });
+        locationPickerLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+                        String addr = result.getData().getStringExtra(LocationPickerActivity.EXTRA_PICKED_ADDRESS);
+                        if (addr != null && !addr.trim().isEmpty()) {
+                            locationInput.setText(addr);
+                        }
+                    }
+                });
 
-        start.setOnClickListener(v -> {
-            Calendar c = Calendar.getInstance();
-            new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-                String t = String.format("%02d:%02d", hourOfDay, minute);
-                start.setText(t);
-            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
-        });
+        locationInput.setOnClickListener(v -> openLocationPicker());
 
-        end.setOnClickListener(v -> {
-            Calendar c = Calendar.getInstance();
-            new TimePickerDialog(this, (view, hourOfDay, minute) -> {
-                String t = String.format("%02d:%02d", hourOfDay, minute);
-                end.setText(t);
-            }, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
-        });
+        dateInput.setOnClickListener(v -> showDatePicker());
+        startInput.setOnClickListener(v -> showTimePicker(true));
+        endInput.setOnClickListener(v -> showTimePicker(false));
 
         findViewById(R.id.btn_publish).setOnClickListener(v -> {
             try {
-                publishShift(title, desc, skill, location, date, start, end, wage, workersNeeded);
+                publishShift();
             } catch (Exception ex) {
                 Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void publishShift(
-            TextInputEditText titleEt,
-            TextInputEditText descEt,
-            TextInputEditText skillEt,
-            TextInputEditText locationEt,
-            TextInputEditText dateEt,
-            TextInputEditText startEt,
-            TextInputEditText endEt,
-            TextInputEditText wageEt,
-            TextInputEditText workersNeededEt
-    ) throws Exception {
-        if (titleEt.getText() == null
-                || skillEt.getText() == null
-                || locationEt.getText() == null
-                || dateEt.getText() == null
-                || startEt.getText() == null
-                || endEt.getText() == null
-                || wageEt.getText() == null) {
+    private void openLocationPicker() {
+        Intent intent = new Intent(this, LocationPickerActivity.class);
+        if (locationInput.getText() != null) {
+            intent.putExtra(LocationPickerActivity.EXTRA_INITIAL_QUERY, locationInput.getText().toString());
+        }
+        locationPickerLauncher.launch(intent);
+    }
+
+    private void showDatePicker() {
+        CalendarConstraints constraints = new CalendarConstraints.Builder()
+                .setValidator(DateValidatorPointForward.now())
+                .build();
+
+        MaterialDatePicker<Long> picker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select shift date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setCalendarConstraints(constraints)
+                .build();
+
+        picker.addOnPositiveButtonClickListener(selection -> {
+            Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            cal.setTimeInMillis(selection);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            dateInput.setText(sdf.format(cal.getTime()));
+        });
+        FragmentManager fm = getSupportFragmentManager();
+        picker.show(fm, "SHIFT_DATE_PICKER");
+    }
+
+    private void showTimePicker(boolean isStart) {
+        Calendar now = Calendar.getInstance();
+        int hour = now.get(Calendar.HOUR_OF_DAY);
+        int minute = now.get(Calendar.MINUTE);
+
+        MaterialTimePicker picker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTitleText(isStart ? "Pick start time" : "Pick end time")
+                .build();
+
+        picker.addOnPositiveButtonClickListener(v -> {
+            int h = picker.getHour();
+            int m = picker.getMinute();
+            String formatted = String.format(Locale.US, "%02d:%02d", h, m);
+            if (isStart) {
+                startInput.setText(formatted);
+            } else {
+                endInput.setText(formatted);
+            }
+        });
+        picker.show(getSupportFragmentManager(), isStart ? "START_TIME" : "END_TIME");
+    }
+
+    private void publishShift() throws Exception {
+        String title = textOf(titleInput);
+        String description = textOf(descInput);
+        String skillRequired = textOf(skillInput);
+        String location = textOf(locationInput);
+        String shiftDate = textOf(dateInput);
+        String startTime = textOf(startInput);
+        String endTime = textOf(endInput);
+        String wageStr = textOf(wageInput);
+
+        if (title.isEmpty() || skillRequired.isEmpty() || location.isEmpty()
+                || shiftDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty()) {
+            Toast.makeText(this, "Fill all required fields", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        String title = titleEt.getText().toString().trim();
-        String description = descEt.getText() != null ? descEt.getText().toString().trim() : "";
-        String skillRequired = skillEt.getText().toString().trim();
-        String location = locationEt.getText().toString().trim();
-        String shiftDate = dateEt.getText().toString().trim();
-        String startTime = startEt.getText().toString().trim();
-        String endTime = endEt.getText().toString().trim();
-        
-        double wageVal = 0;
+        double wageVal;
         try {
-            wageVal = Double.parseDouble(wageEt.getText().toString().trim());
+            wageVal = Double.parseDouble(wageStr);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Please enter a valid wage amount", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        int workersNeededVal = 1;
-        if (workersNeededEt != null && workersNeededEt.getText() != null) {
-            String raw = workersNeededEt.getText().toString().trim();
-            if (!raw.isEmpty()) {
-                try {
-                    workersNeededVal = Math.max(1, Integer.parseInt(raw));
-                } catch (NumberFormatException ignored) {
-                    workersNeededVal = 1;
-                }
-            }
-        }
-
-        if (title.isEmpty()
-                || skillRequired.isEmpty()
-                || location.isEmpty()
-                || shiftDate.isEmpty()
-                || startTime.isEmpty()
-                || endTime.isEmpty()) {
-            Toast.makeText(this, "Fill all required fields", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        int workersNeededVal = parsePositiveInt(workersNeededInput, 1);
+        int durationDaysVal = parsePositiveInt(durationDaysInput, 1);
 
         JSONObject body = new JSONObject();
         body.put("title", title);
@@ -158,6 +198,7 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
         body.put("endTime", endTime);
         body.put("wage", wageVal);
         body.put("workersNeeded", workersNeededVal);
+        body.put("durationDays", durationDaysVal);
 
         progressBar.setVisibility(View.VISIBLE);
         new Thread(() -> {
@@ -179,5 +220,20 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
                 });
             }
         }).start();
+    }
+
+    private static String textOf(TextInputEditText et) {
+        if (et == null || et.getText() == null) return "";
+        return et.getText().toString().trim();
+    }
+
+    private static int parsePositiveInt(TextInputEditText et, int fallback) {
+        String raw = textOf(et);
+        if (raw.isEmpty()) return fallback;
+        try {
+            return Math.max(1, Integer.parseInt(raw));
+        } catch (NumberFormatException e) {
+            return fallback;
+        }
     }
 }

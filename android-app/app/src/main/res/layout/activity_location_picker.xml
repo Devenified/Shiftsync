@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_screen_gradient"
+    android:orientation="vertical">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/bg_hero_gradient"
+        android:elevation="6dp"
+        app:navigationIcon="?attr/homeAsUpIndicator"
+        app:navigationIconTint="#FFFFFF"
+        app:title="Pick Location"
+        app:titleTextColor="#FFFFFF" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/screen_padding_horizontal">
+
+            <!-- Search / manual entry -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardBackgroundColor="#FFFFFF"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="4dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/card_inner_padding">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Search address, area, or landmark"
+                        android:textColor="@color/text_primary"
+                        android:textSize="@dimen/text_subtitle"
+                        android:textStyle="bold" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.ShiftSync.TextInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="e.g. HSR Layout, Bengaluru"
+                        app:endIconDrawable="@drawable/ic_search_modern"
+                        app:endIconMode="custom"
+                        app:startIconDrawable="@drawable/ic_location_modern">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/location_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:imeOptions="actionSearch"
+                            android:inputType="textPostalAddress"
+                            android:textColor="@color/text_primary" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_use_current"
+                        style="@style/Widget.ShiftSync.Button.Primary"
+                        android:layout_width="match_parent"
+                        android:layout_height="@dimen/button_height_standard"
+                        android:layout_marginTop="10dp"
+                        android:text="Use my current location"
+                        app:icon="@drawable/ic_location_modern"
+                        app:iconTint="#FFFFFF" />
+
+                    <ProgressBar
+                        android:id="@+id/location_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="8dp"
+                        android:indeterminateTint="@color/brand_primary"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Preview of the currently picked location -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                app:cardBackgroundColor="@color/brand_surface"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/brand_primary"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+
+                    <FrameLayout
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_icon_container_primary">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_location_modern"
+                            app:tint="#FFFFFF" />
+                    </FrameLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Selected location"
+                            android:textColor="@color/text_muted"
+                            android:textSize="@dimen/text_caption" />
+
+                        <TextView
+                            android:id="@+id/selected_preview"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="No location picked yet"
+                            android:textColor="@color/text_primary"
+                            android:textSize="@dimen/text_body"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Popular areas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Popular areas"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_subtitle"
+                android:textStyle="bold" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/popular_chips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:chipSpacingHorizontal="8dp"
+                app:chipSpacingVertical="6dp" />
+
+            <!-- Results list -->
+            <TextView
+                android:id="@+id/results_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="Matching places"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_subtitle"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/results_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="false" />
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_confirm"
+        style="@style/Widget.ShiftSync.Button.Primary"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/button_height_large"
+        android:layout_margin="@dimen/screen_padding_horizontal"
+        android:text="Confirm location"
+        app:icon="@drawable/ic_check_modern"
+        app:iconTint="#FFFFFF" />
+</LinearLayout>

@@ -12,6 +12,7 @@ const notificationSchema = new mongoose.Schema(
         'shift_created',
         'shift_updated',
         'shift_cancelled',
+        'shift_rejected',
         'swap_request',
         'swap_approved',
         'swap_rejected',

@@ -24,7 +24,8 @@ exports.createShift = async (req, res) => {
       startTime,
       endTime,
       wage,
-      workersNeeded
+      workersNeeded,
+      durationDays
     } = req.body;
 
     if (!title || !skillRequired || !location || !shiftDate || !startTime || !endTime || wage == null) {
@@ -32,6 +33,7 @@ exports.createShift = async (req, res) => {
     }
 
     const needed = Math.max(1, Number(workersNeeded) || 1);
+    const days = Math.max(1, Number(durationDays) || 1);
 
     const shift = await Shift.create({
       employer: req.user.id,
@@ -43,7 +45,8 @@ exports.createShift = async (req, res) => {
       startTime,
       endTime,
       wage,
-      workersNeeded: needed
+      workersNeeded: needed,
+      durationDays: days
     });
 
     await ActivityFeed.create({
@@ -264,12 +267,33 @@ exports.reviewApplication = async (req, res) => {
       relatedId: shift._id
     });
 
+    const rejectMessage = `Sorry, your application for "${shift.title}" was not selected. Keep applying - more shifts are posted every day!`;
+    const acceptMessage = `You're hired! Your application for "${shift.title}" was accepted. Check "My Shifts" for details.`;
     await Notification.create({
       userId: req.params.workerId,
-      message: `Your application for ${shift.title} was ${decision}.`,
-      type: decision === 'accepted' ? 'shift_assignment' : 'shift_updated',
+      message: decision === 'accepted' ? acceptMessage : rejectMessage,
+      type: decision === 'accepted' ? 'shift_assignment' : 'shift_rejected',
       relatedId: shift._id
     });
+
+    // If the shift got fully staffed, auto-rejection went out to others.
+    // Make sure each one of them gets a notification as well.
+    if (decision === 'accepted' && shift.status === 'assigned') {
+      const autoRejectIds = shift.applications
+        .filter((a) => a.status === 'rejected' && a.worker.toString() !== req.params.workerId)
+        .map((a) => a.worker.toString());
+      const unique = Array.from(new Set(autoRejectIds));
+      if (unique.length > 0) {
+        await Notification.insertMany(
+          unique.map((id) => ({
+            userId: id,
+            message: rejectMessage,
+            type: 'shift_rejected',
+            relatedId: shift._id
+          }))
+        );
+      }
+    }
 
     return res.json({
       message: `Application ${decision}`,
@@ -322,11 +346,14 @@ exports.completeShift = async (req, res) => {
     }
     await shift.save();
 
+    const days = Math.max(1, shift.durationDays || 1);
+    const payout = shift.wage * days;
+
     const ops = Array.from(workerIds).map((workerId) =>
       User.findByIdAndUpdate(workerId, {
         $inc: {
           completedShifts: 1,
-          totalEarnings: shift.wage
+          totalEarnings: payout
         }
       })
     );
@@ -336,7 +363,7 @@ exports.completeShift = async (req, res) => {
       Array.from(workerIds).map((workerId) =>
         Notification.create({
           userId: workerId,
-          message: `Your shift "${shift.title}" was marked as completed. \u20B9${shift.wage} credited.`,
+          message: `Your shift "${shift.title}" was marked as completed. \u20B9${payout} credited.`,
           type: 'shift_updated',
           relatedId: shift._id
         })
@@ -357,7 +384,8 @@ exports.completeShift = async (req, res) => {
     return res.json({
       message: 'Shift marked as completed',
       paidWorkers: workerIds.size,
-      wagePerWorker: shift.wage
+      wagePerWorker: payout,
+      durationDays: days
     });
   } catch (err) {
     console.error('Complete shift error', err);
@@ -414,7 +442,8 @@ exports.updateShift = async (req, res) => {
       'startTime',
       'endTime',
       'wage',
-      'workersNeeded'
+      'workersNeeded',
+      'durationDays'
     ];
     allowed.forEach((f) => {
       if (req.body[f] !== undefined) {
@@ -426,6 +455,8 @@ exports.updateShift = async (req, res) => {
           } else {
             shift.workersNeeded = requested;
           }
+        } else if (f === 'durationDays') {
+          shift.durationDays = Math.max(1, Number(req.body[f]) || 1);
         } else {
           shift[f] = req.body[f];
         }

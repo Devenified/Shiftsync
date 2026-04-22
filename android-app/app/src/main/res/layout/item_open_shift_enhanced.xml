@@ -195,7 +195,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Daily Wage"
+                    android:text="Wage"
                     android:textColor="@color/text_muted"
                     android:textSize="@dimen/text_caption" />
 

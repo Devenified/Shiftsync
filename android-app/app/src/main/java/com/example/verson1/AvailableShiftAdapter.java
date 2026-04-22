@@ -40,7 +40,7 @@ public class AvailableShiftAdapter extends RecyclerView.Adapter<AvailableShiftAd
         AvailableShift shift = shifts.get(position);
         
         holder.tvShiftTitle.setText(shift.getTitle());
-        holder.tvWage.setText("$" + shift.getWage() + "/hour");
+        holder.tvWage.setText("\u20B9" + shift.getWage() + "/day");
         holder.tvShiftType.setText(shift.getType());
         holder.tvDate.setText(shift.getDate());
         holder.tvTime.setText(shift.getTime());

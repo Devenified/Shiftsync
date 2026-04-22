@@ -214,17 +214,43 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
             holder.skills.setText(shift.optString("skillRequired", ""));
 
             double wage = shift.optDouble("wage", 0);
-            holder.wage.setText("\u20B9" + (int) wage);
+            int days = Math.max(1, shift.optInt("durationDays", 1));
+            if (days > 1) {
+                holder.wage.setText("\u20B9" + (int) wage + "/day \u00B7 " + days + " days");
+            } else {
+                holder.wage.setText("\u20B9" + (int) wage + "/day");
+            }
 
             String status = shift.optString("status", "");
-            String appStatus = shift.optString("applicationStatus", "null");
-            if ("null".equals(appStatus)) {
-                appStatus = "Pending";
+            String appStatusRaw = shift.optString("applicationStatus", "null");
+            if ("null".equals(appStatusRaw) || appStatusRaw.isEmpty()) {
+                appStatusRaw = "pending";
             }
 
             holder.statusBadge.setText(status.toUpperCase());
             holder.statusBadge.setBackgroundResource(getStatusBackground(status));
-            holder.applicationStatus.setText("Application: " + appStatus);
+
+            String appStatusTitle = appStatusRaw.substring(0, 1).toUpperCase()
+                    + appStatusRaw.substring(1).toLowerCase();
+            String appLabel;
+            switch (appStatusRaw.toLowerCase()) {
+                case "accepted":
+                    appLabel = "\u2713 Accepted - you got the shift!";
+                    holder.applicationStatus.setTextColor(
+                            ContextCompat.getColor(WorkerMyShiftsActivity.this, R.color.status_success));
+                    break;
+                case "rejected":
+                    appLabel = "\u2717 Not selected this time";
+                    holder.applicationStatus.setTextColor(
+                            ContextCompat.getColor(WorkerMyShiftsActivity.this, R.color.status_busy));
+                    break;
+                default:
+                    appLabel = "Application: " + appStatusTitle;
+                    holder.applicationStatus.setTextColor(
+                            ContextCompat.getColor(WorkerMyShiftsActivity.this, R.color.text_medium));
+                    break;
+            }
+            holder.applicationStatus.setText(appLabel);
 
             holder.actionButton.setText("View Details");
             holder.actionButton.setOnClickListener(v -> showShiftDetailsDialog(shift));
@@ -242,6 +268,8 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
                     : formatTime(startTime) + " - " + formatTime(endTime);
             String skills = shift.optString("skillRequired", "None");
             double wage = shift.optDouble("wage", 0);
+            int days = Math.max(1, shift.optInt("durationDays", 1));
+            int totalPayout = (int) wage * days;
             String status = shift.optString("status", "").toUpperCase();
             String appStatus = shift.optString("applicationStatus", "Unknown");
 
@@ -249,9 +277,11 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
 
             String message = "Date: " + date + "\n" +
                     "Time: " + rawTime + "\n" +
+                    "Duration: " + days + (days == 1 ? " day" : " days") + "\n" +
                     "Location: " + location + "\n" +
                     "Skills: " + skills + "\n" +
-                    "Wage: \u20B9" + (int) wage + "\n\n" +
+                    "Wage: \u20B9" + (int) wage + "/day"
+                    + (days > 1 ? "  (Total: \u20B9" + totalPayout + ")" : "") + "\n\n" +
                     "Status: " + status + "\n" +
                     "Your Application: " + displayStatus + "\n\n" +
                     "Description:\n" + desc;
