@@ -1,116 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/white">
-
-    <!-- Toolbar -->
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/primary_color"
-        android:elevation="4dp"
-        app:menu="@menu/menu_toolbar_sign_out"
-        app:navigationIcon="?attr/homeAsUpIndicator"
-        app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
-        app:title="AI Skill Advisor"
-        app:titleTextColor="#FFFFFF"
-        app:navigationIconTint="#FFFFFF" />
-
-    <!-- Quick Action Buttons -->
-    <HorizontalScrollView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/light_gray"
-        android:paddingVertical="8dp"
-        android:scrollbars="none">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="12dp"
-            android:gravity="center">
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_skill_assessment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
-                android:text="📊 Assess Skills"
-                android:textSize="12sp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_job_recommendations"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="💼 Job Ideas"
-                android:textSize="12sp"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
-
-        </LinearLayout>
-
-    </HorizontalScrollView>
-
-    <!-- Messages RecyclerView -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/message_recycler"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingVertical="12dp"
-        android:paddingHorizontal="8dp"
-        android:clipToPadding="false" />
-
-    <!-- Progress Bar -->
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="match_parent"
-        android:layout_height="4dp"
-        android:visibility="gone"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal" />
-
-    <!-- Input Section -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider_color" />
+    android:background="@drawable/bg_ai_screen_gradient">
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:id="@+id/header_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:background="@color/white"
-        android:gravity="center_vertical">
+        android:background="@drawable/bg_ai_header_card"
+        android:elevation="6dp"
+        android:orientation="vertical"
+        android:paddingBottom="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/question_input"
-            android:layout_width="0dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:hint="Ask me anything about skills..."
-            android:inputType="text"
-            android:lines="1"
-            android:paddingHorizontal="16dp"
-            android:background="@drawable/bg_input_rounded"
-            android:textSize="14sp" />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            app:menu="@menu/menu_toolbar_sign_out"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:navigationIconTint="@color/text_primary"
+            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+            app:title="AI Skill Advisor"
+            app:titleTextColor="@color/text_primary" />
 
-        <ImageButton
-            android:id="@+id/btn_send"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
-            android:contentDescription="Send question"
-            android:background="@drawable/bg_button_rounded"
-            android:src="@android:drawable/ic_menu_send"
-            android:scaleType="centerInside"
-            android:tint="@color/white" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingStart="20dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="8dp">
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Career guidance tailored to shift workers"
+                android:textColor="@color/text_primary"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Get sharper skill advice, growth plans, and better-paying job ideas without leaving the conversation."
+                android:textColor="@color/ai_text_subtle"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp" />
+        </LinearLayout>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:paddingTop="6dp"
+            android:paddingBottom="8dp"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_skill_assessment"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="Assess skills"
+                    android:textAllCaps="false"
+                    android:textColor="@color/ai_chip_text"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/ai_chip_bg"
+                    app:cornerRadius="24dp"
+                    app:strokeColor="@color/ai_chip_stroke"
+                    app:strokeWidth="1dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_job_recommendations"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingStart="18dp"
+                    android:paddingEnd="18dp"
+                    android:text="Job ideas"
+                    android:textAllCaps="false"
+                    android:textColor="@color/ai_chip_text"
+                    android:textSize="13sp"
+                    app:backgroundTint="@color/ai_chip_bg"
+                    app:cornerRadius="24dp"
+                    app:strokeColor="@color/ai_chip_stroke"
+                    app:strokeWidth="1dp" />
+            </LinearLayout>
+        </HorizontalScrollView>
     </LinearLayout>
 
-</LinearLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="0dp"
+        android:layout_height="4dp"
+        android:indeterminateTint="@color/primary_color"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/header_container" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/message_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingStart="6dp"
+        android:paddingTop="14dp"
+        android:paddingEnd="6dp"
+        android:paddingBottom="14dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toTopOf="@id/composer_card"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/progress_bar" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/composer_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_marginEnd="14dp"
+        android:layout_marginBottom="14dp"
+        android:backgroundTint="@android:color/transparent"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="26dp"
+        app:cardElevation="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@android:color/transparent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_ai_composer"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/question_input"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_ai_input_surface"
+                android:gravity="center_vertical"
+                android:hint="Ask about skill growth, better jobs, or next steps..."
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLines="4"
+                android:minLines="1"
+                android:paddingStart="18dp"
+                android:paddingTop="14dp"
+                android:paddingEnd="18dp"
+                android:paddingBottom="14dp"
+                android:textColor="@color/text_primary"
+                android:textColorHint="@color/ai_text_subtle"
+                android:textSize="14sp" />
+
+            <ImageButton
+                android:id="@+id/btn_send"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/bg_ai_send_button"
+                android:contentDescription="Send question"
+                android:padding="14dp"
+                android:scaleType="centerInside"
+                android:src="@android:drawable/ic_menu_send"
+                android:tint="@color/white" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

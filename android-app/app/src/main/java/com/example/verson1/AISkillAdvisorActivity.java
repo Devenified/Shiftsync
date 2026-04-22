@@ -3,6 +3,8 @@ package com.example.verson1;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -10,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -83,6 +86,8 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
         messages = new ArrayList<>();
         messageAdapter = new AIMessageAdapter(messages);
         messageRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        messageRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        messageRecyclerView.setLayoutAnimation(android.view.animation.AnimationUtils.loadLayoutAnimation(this, R.anim.layout_ai_messages));
         messageRecyclerView.setAdapter(messageAdapter);
     }
 
@@ -101,6 +106,23 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
             sendQuestion();
             return true;
         });
+
+        questionEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateSendButtonState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+        updateSendButtonState();
     }
 
     private void addWelcomeMessage() {
@@ -116,6 +138,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
         );
         messages.add(welcome);
         messageAdapter.notifyItemInserted(messages.size() - 1);
+        messageRecyclerView.scheduleLayoutAnimation();
         scrollToBottom();
     }
 
@@ -137,6 +160,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
         questionEditText.setText("");
         sendButton.setEnabled(false);
         progressBar.setVisibility(View.VISIBLE);
+        updateSendButtonState();
 
         // Send to backend
         askSkillAdvisor(question);
@@ -156,7 +180,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
 
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
+                    updateSendButtonState();
 
                     if (res.code == 200) {
                         try {
@@ -200,7 +224,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
+                    updateSendButtonState();
                     showErrorMessage("Connection error: " + e.getMessage());
                 });
             }
@@ -237,6 +261,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
     private void performSkillAssessment(String currentSkills, String targetSkills, String experience) {
         progressBar.setVisibility(View.VISIBLE);
         sendButton.setEnabled(false);
+        updateSendButtonState();
 
         new Thread(() -> {
             try {
@@ -275,7 +300,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
 
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
+                    updateSendButtonState();
 
                     if (res.code == 200) {
                         try {
@@ -302,7 +327,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
+                    updateSendButtonState();
                     showErrorMessage("Connection error");
                 });
             }
@@ -339,6 +364,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
     private void performJobRecommendations(String skills, String location, String workType) {
         progressBar.setVisibility(View.VISIBLE);
         sendButton.setEnabled(false);
+        updateSendButtonState();
 
         new Thread(() -> {
             try {
@@ -367,7 +393,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
 
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
+                    updateSendButtonState();
 
                     if (res.code == 200) {
                         try {
@@ -394,7 +420,7 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
-                    sendButton.setEnabled(true);
+                    updateSendButtonState();
                     showErrorMessage("Connection error");
                 });
             }
@@ -412,7 +438,20 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
         scrollToBottom();
     }
 
+    private void updateSendButtonState() {
+        boolean hasText = questionEditText != null
+                && questionEditText.getText() != null
+                && questionEditText.getText().toString().trim().length() > 0;
+        boolean isReady = hasText && progressBar.getVisibility() != View.VISIBLE;
+        sendButton.setEnabled(isReady);
+        sendButton.setAlpha(isReady ? 1f : 0.55f);
+        sendButton.setScaleX(isReady ? 1f : 0.96f);
+        sendButton.setScaleY(isReady ? 1f : 0.96f);
+    }
+
     private void scrollToBottom() {
-        messageRecyclerView.scrollToPosition(messages.size() - 1);
+        if (!messages.isEmpty()) {
+            messageRecyclerView.smoothScrollToPosition(messages.size() - 1);
+        }
     }
 }
