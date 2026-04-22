@@ -20,6 +20,8 @@ public class WorkerDashboardNewActivity extends AppCompatActivity {
     private TextView workerStatus;
     private TextView todayEarnings;
     private TextView monthlyEarnings;
+    private TextView lifetimeEarnings;
+    private TextView completedCount;
     private TextView availabilityText;
     private TextView recentActivityText;
     private Switch availabilitySwitch;
@@ -52,6 +54,8 @@ public class WorkerDashboardNewActivity extends AppCompatActivity {
         workerStatus = findViewById(R.id.worker_status);
         todayEarnings = findViewById(R.id.today_earnings);
         monthlyEarnings = findViewById(R.id.monthly_earnings);
+        lifetimeEarnings = findViewById(R.id.lifetime_earnings);
+        completedCount = findViewById(R.id.completed_count);
         availabilityText = findViewById(R.id.availability_text);
         recentActivityText = findViewById(R.id.recent_activity_text);
         availabilitySwitch = findViewById(R.id.availability_switch);
@@ -92,6 +96,12 @@ public class WorkerDashboardNewActivity extends AppCompatActivity {
 
         findViewById(R.id.notification_icon).setOnClickListener(v ->
                 startActivity(new Intent(this, NotificationsActivity.class)));
+
+        View earningsHero = findViewById(R.id.earnings_hero_card);
+        if (earningsHero != null) {
+            earningsHero.setOnClickListener(v ->
+                    startActivity(new Intent(this, WorkerEarningsActivity.class)));
+        }
     }
 
     private void setupBottomNavigation() {
@@ -190,11 +200,18 @@ public class WorkerDashboardNewActivity extends AppCompatActivity {
                             JSONObject summary = new JSONObject(res.body).getJSONObject("summary");
                             double todayEarningsVal = summary.optDouble("todayEarnings", 0);
                             double monthlyEarningsVal = summary.optDouble("monthlyEarnings", 0);
+                            double lifetimeEarningsVal = summary.optDouble("totalEarnings", 0);
                             boolean isAvailable = summary.optBoolean("isAvailable", false);
                             int completedShifts = summary.optInt("completedShifts", 0);
 
-                            todayEarnings.setText(String.format(getString(R.string.earnings_today_format), (int) todayEarningsVal));
-                            monthlyEarnings.setText(String.format(getString(R.string.earnings_month_format), (int) monthlyEarningsVal));
+                            todayEarnings.setText("\u20B9" + (int) todayEarningsVal);
+                            monthlyEarnings.setText("\u20B9" + (int) monthlyEarningsVal);
+                            if (lifetimeEarnings != null) {
+                                lifetimeEarnings.setText("\u20B9" + (int) lifetimeEarningsVal);
+                            }
+                            if (completedCount != null) {
+                                completedCount.setText(String.valueOf(completedShifts));
+                            }
                             updateAvailabilityUI(isAvailable);
 
                             if (completedShifts > 0) {

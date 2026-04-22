@@ -48,6 +48,7 @@
         <activity android:name=".RequestLeaveActivity" />
         <activity android:name=".NotificationsActivity" />
         <activity android:name=".WorkerPublicProfileActivity" />
+        <activity android:name=".WorkerEarningsActivity" />
         <activity
             android:name=".CrashScreenActivity"
             android:exported="false"

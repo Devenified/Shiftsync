@@ -66,8 +66,10 @@
     <string name="register_subtitle">Set up your account once and manage shifts, staff, and earnings from a cleaner dashboard.</string>
     <string name="worker_dashboard_overview">Today at a glance</string>
     <string name="worker_dashboard_subtitle">Keep your status updated and move between new work, assigned shifts, and profile details faster.</string>
-    <string name="worker_stat_total">Lifetime earnings</string>
-    <string name="worker_stat_month">Monthly view</string>
+    <string name="worker_stat_total">Today\'s earnings</string>
+    <string name="worker_stat_month">This month</string>
+    <string name="worker_stat_lifetime">Lifetime earnings</string>
+    <string name="view_all_earnings">View earnings history</string>
     <string name="worker_stat_status">Availability</string>
     <string name="worker_open_shifts_title">Open Shifts</string>
     <string name="worker_open_shifts_subtitle">Fresh opportunities matched to your skills.</string>

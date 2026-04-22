@@ -154,84 +154,143 @@
                 android:orientation="vertical"
                 android:paddingHorizontal="20dp">
 
-                <LinearLayout
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/earnings_hero_card"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:orientation="horizontal">
+                    android:layout_marginBottom="12dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="24dp"
+                    app:cardElevation="0dp">
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp">
+                        android:background="@drawable/bg_earnings_card"
+                        android:orientation="vertical"
+                        android:padding="22dp">
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_card_sunrise"
-                            android:orientation="vertical"
-                            android:padding="18dp">
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:alpha="0.85"
+                                android:text="@string/worker_stat_lifetime"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_caption" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:alpha="0.85"
-                                android:text="@string/worker_stat_total"
+                                android:text="@string/view_all_earnings"
                                 android:textColor="@android:color/white"
-                                android:textSize="@dimen/text_caption" />
-
-                            <TextView
-                                android:id="@+id/today_earnings"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="&#8377;0"
-                                android:textColor="@android:color/white"
-                                android:textSize="@dimen/text_money_medium"
+                                android:textSize="@dimen/text_caption"
                                 android:textStyle="bold" />
                         </LinearLayout>
-                    </androidx.cardview.widget.CardView>
 
-                    <androidx.cardview.widget.CardView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="6dp"
-                        android:layout_weight="1"
-                        app:cardBackgroundColor="@android:color/transparent"
-                        app:cardCornerRadius="24dp"
-                        app:cardElevation="0dp">
+                        <TextView
+                            android:id="@+id/lifetime_earnings"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="&#8377;0"
+                            android:textColor="@android:color/white"
+                            android:textSize="32sp"
+                            android:textStyle="bold" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/bg_card_indigo"
-                            android:orientation="vertical"
-                            android:padding="18dp">
+                            android:layout_marginTop="14dp"
+                            android:orientation="horizontal">
 
-                            <TextView
-                                android:layout_width="wrap_content"
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:alpha="0.85"
-                                android:text="@string/worker_stat_month"
-                                android:textColor="@android:color/white"
-                                android:textSize="@dimen/text_caption" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
 
-                            <TextView
-                                android:id="@+id/monthly_earnings"
-                                android:layout_width="wrap_content"
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:alpha="0.8"
+                                    android:text="@string/worker_stat_total"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_caption" />
+
+                                <TextView
+                                    android:id="@+id/today_earnings"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="&#8377;0"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="This month: &#8377;0"
-                                android:textColor="@android:color/white"
-                                android:textSize="@dimen/text_body_large"
-                                android:textStyle="bold" />
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:alpha="0.8"
+                                    android:text="@string/worker_stat_month"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_caption" />
+
+                                <TextView
+                                    android:id="@+id/monthly_earnings"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="&#8377;0"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:alpha="0.8"
+                                    android:text="Shifts done"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_caption" />
+
+                                <TextView
+                                    android:id="@+id/completed_count"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="0"
+                                    android:textColor="@android:color/white"
+                                    android:textSize="@dimen/text_subtitle"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
                         </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-                </LinearLayout>
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
 
                 <TextView
                     android:layout_width="wrap_content"
