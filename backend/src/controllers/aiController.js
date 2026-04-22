@@ -1,16 +1,6 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-
-let _genAI = null;
-function getGenAI() {
-  if (!_genAI) {
-    _genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-  }
-  return _genAI;
-}
-
-function getModel() {
-  return getGenAI().getGenerativeModel({ model: 'gemini-2.0-flash' });
-}
+const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
+const { ChatPromptTemplate, MessagesPlaceholder } = require('@langchain/core/prompts');
+const { HumanMessage, AIMessage } = require('@langchain/core/messages');
 
 const SYSTEM_PROMPT = `You are an intelligent Skill Advisor Assistant for ShiftSync, a worker marketplace platform.
 
@@ -55,33 +45,136 @@ Guidelines:
 
 const conversationMemories = new Map();
 const MEMORY_TTL_MS = 30 * 60 * 1000;
+const MAX_HISTORY_PAIRS = 8;
 
-function getMemory(userId) {
-  const existing = conversationMemories.get(userId);
+let chatModel = null;
+
+function getModel() {
+  if (chatModel) {
+    return chatModel;
+  }
+
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error('GEMINI_API_KEY is missing');
+  }
+
+  chatModel = new ChatGoogleGenerativeAI({
+    apiKey: process.env.GEMINI_API_KEY,
+    model: 'gemini-2.0-flash',
+    temperature: 0.4,
+  });
+
+  return chatModel;
+}
+
+function getConversationKey(userId, assistantType) {
+  return `${assistantType}:${userId}`;
+}
+
+function getMemory(userId, assistantType) {
+  const key = getConversationKey(userId, assistantType);
+  const existing = conversationMemories.get(key);
+
   if (existing && Date.now() - existing.lastAccess < MEMORY_TTL_MS) {
     existing.lastAccess = Date.now();
     return existing.history;
   }
+
   const history = [];
-  conversationMemories.set(userId, { history, lastAccess: Date.now() });
+  conversationMemories.set(key, { history, lastAccess: Date.now() });
   return history;
 }
 
-function trimMemory(history, maxPairs = 8) {
+function trimMemory(history, maxPairs = MAX_HISTORY_PAIRS) {
   while (history.length > maxPairs * 2) {
     history.shift();
   }
 }
 
-function buildPrompt(systemPrompt, history, question) {
-  let prompt = systemPrompt + '\n\n';
-  for (const entry of history) {
-    prompt += entry.role === 'user'
-      ? `User: ${entry.text}\n`
-      : `Assistant: ${entry.text}\n`;
+function touchMemory(userId, assistantType, history) {
+  conversationMemories.set(getConversationKey(userId, assistantType), {
+    history,
+    lastAccess: Date.now(),
+  });
+}
+
+function createChain(systemPrompt) {
+  const prompt = ChatPromptTemplate.fromMessages([
+    ['system', systemPrompt],
+    new MessagesPlaceholder('history'),
+    ['human', '{question}'],
+  ]);
+
+  return prompt.pipe(getModel());
+}
+
+function getTextContent(content) {
+  if (typeof content === 'string') {
+    return content;
   }
-  prompt += `User: ${question}\n\nAssistant:`;
-  return prompt;
+
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === 'string') {
+          return part;
+        }
+        if (part && typeof part.text === 'string') {
+          return part.text;
+        }
+        return '';
+      })
+      .join('');
+  }
+
+  return '';
+}
+
+async function runAssistant({ systemPrompt, assistantType, userId, question }) {
+  const history = getMemory(userId, assistantType);
+  const chain = createChain(systemPrompt);
+  const response = await chain.invoke({
+    history,
+    question,
+  });
+
+  const answer = getTextContent(response.content).trim();
+
+  history.push(new HumanMessage(question));
+  history.push(new AIMessage(answer));
+  trimMemory(history);
+  touchMemory(userId, assistantType, history);
+
+  return answer;
+}
+
+async function streamAssistant({ systemPrompt, assistantType, userId, question, res }) {
+  const history = getMemory(userId, assistantType);
+  const chain = createChain(systemPrompt);
+  const stream = await chain.stream({
+    history,
+    question,
+  });
+
+  let fullResponse = '';
+
+  for await (const chunk of stream) {
+    const text = getTextContent(chunk.content);
+    if (!text) {
+      continue;
+    }
+
+    fullResponse += text;
+    res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
+  }
+
+  const answer = fullResponse.trim();
+  history.push(new HumanMessage(question));
+  history.push(new AIMessage(answer));
+  trimMemory(history);
+  touchMemory(userId, assistantType, history);
+
+  return answer;
 }
 
 function handleAIError(err, res) {
@@ -94,7 +187,7 @@ function handleAIError(err, res) {
       answer: 'I\'m temporarily unavailable due to high usage. Please try again in a few minutes!',
     });
   }
-  if (msg.includes('API key') || msg.includes('API_KEY_INVALID')) {
+  if (msg.includes('API key') || msg.includes('API_KEY_INVALID') || msg.includes('missing')) {
     return res.status(500).json({ message: 'AI service not configured. Please set a valid GEMINI_API_KEY.' });
   }
   if (msg.includes('404') || msg.includes('not found')) {
@@ -103,27 +196,34 @@ function handleAIError(err, res) {
   return res.status(500).json({ message: 'Error generating AI response. Please try again.' });
 }
 
+function validateQuestion(req, res) {
+  const { question } = req.body;
+
+  if (!question || typeof question !== 'string' || question.trim().length === 0) {
+    res.status(400).json({ message: 'Question is required' });
+    return null;
+  }
+
+  return question.trim();
+}
+
 /**
  * POST /api/ai/ask-skill-advisor
  */
 exports.askSkillAdvisor = async (req, res) => {
   try {
-    const { question } = req.body;
-    if (!question || typeof question !== 'string' || question.trim().length === 0) {
-      return res.status(400).json({ message: 'Question is required' });
+    const question = validateQuestion(req, res);
+    if (!question) {
+      return;
     }
 
     const userId = req.user.id;
-    const history = getMemory(userId);
-    const prompt = buildPrompt(SYSTEM_PROMPT, history, question.trim());
-
-    const model = getModel();
-    const result = await model.generateContent(prompt);
-    const answer = result.response.text();
-
-    history.push({ role: 'user', text: question.trim() });
-    history.push({ role: 'assistant', text: answer });
-    trimMemory(history);
+    const answer = await runAssistant({
+      systemPrompt: SYSTEM_PROMPT,
+      assistantType: 'worker-skill-advisor',
+      userId,
+      question,
+    });
 
     console.log(`[AI] User ${userId}: ${question.substring(0, 80)}...`);
 
@@ -143,9 +243,9 @@ exports.askSkillAdvisor = async (req, res) => {
  */
 exports.askSkillAdvisorStream = async (req, res) => {
   try {
-    const { question } = req.body;
-    if (!question || typeof question !== 'string' || question.trim().length === 0) {
-      return res.status(400).json({ message: 'Question is required' });
+    const question = validateQuestion(req, res);
+    if (!question) {
+      return;
     }
 
     res.setHeader('Content-Type', 'text/event-stream');
@@ -153,32 +253,23 @@ exports.askSkillAdvisorStream = async (req, res) => {
     res.setHeader('Connection', 'keep-alive');
 
     const userId = req.user.id;
-    const history = getMemory(userId);
-    const prompt = buildPrompt(SYSTEM_PROMPT, history, question.trim());
+    const answer = await streamAssistant({
+      systemPrompt: SYSTEM_PROMPT,
+      assistantType: 'worker-skill-advisor',
+      userId,
+      question,
+      res,
+    });
 
-    const model = getModel();
-    const result = await model.generateContentStream(prompt);
-
-    let fullResponse = '';
-    for await (const chunk of result.stream) {
-      const text = chunk.text();
-      if (text) {
-        fullResponse += text;
-        res.write(`data: ${JSON.stringify({ chunk: text })}\n\n`);
-      }
-    }
-
-    history.push({ role: 'user', text: question.trim() });
-    history.push({ role: 'assistant', text: fullResponse });
-    trimMemory(history);
-
-    res.write(`data: ${JSON.stringify({ done: true, answer: fullResponse })}\n\n`);
+    res.write(`data: ${JSON.stringify({ done: true, answer })}\n\n`);
     res.end();
   } catch (err) {
     console.error('Stream error:', err.message?.substring(0, 200));
     if (!res.headersSent) {
       return handleAIError(err, res);
     }
+
+    res.write(`data: ${JSON.stringify({ done: true, error: 'Error generating AI response. Please try again.' })}\n\n`);
     res.end();
   }
 };
@@ -193,12 +284,10 @@ exports.skillAssessment = async (req, res) => {
       return res.status(400).json({ message: 'Current skills must be provided as an array' });
     }
 
-    const prompt = `${SYSTEM_PROMPT}
-
-Provide a detailed skill assessment for a worker:
+    const question = `Provide a detailed skill assessment for a worker:
 - Current Skills: ${currentSkills.join(', ')}
 - Target Skills: ${targetSkills ? targetSkills.join(', ') : 'Not specified'}
-- Experience: ${experience ? experience + ' years' : 'Not specified'}
+- Experience: ${experience ? `${experience} years` : 'Not specified'}
 
 Please provide:
 1. Assessment of current skill level
@@ -207,9 +296,12 @@ Please provide:
 4. Estimated timeline for skill development
 5. Potential salary/earning increase with these skills`;
 
-    const model = getModel();
-    const result = await model.generateContent(prompt);
-    const assessment = result.response.text();
+    const assessment = await runAssistant({
+      systemPrompt: SYSTEM_PROMPT,
+      assistantType: 'worker-skill-assessment',
+      userId: req.user.id,
+      question,
+    });
 
     return res.json({
       message: 'Skill assessment completed',
@@ -231,9 +323,7 @@ exports.jobRecommendations = async (req, res) => {
       return res.status(400).json({ message: 'Skills must be provided as a non-empty array' });
     }
 
-    const prompt = `${SYSTEM_PROMPT}
-
-Based on this worker profile, recommend the best opportunities:
+    const question = `Based on this worker profile, recommend the best opportunities:
 - Skills: ${skills.join(', ')}
 - Location: ${location || 'Not specified'}
 - Preferred Work Type: ${workType || 'Open to any work type'}
@@ -245,9 +335,12 @@ Please provide:
 4. Tips to stand out
 5. Certifications that could increase earnings`;
 
-    const model = getModel();
-    const result = await model.generateContent(prompt);
-    const recommendations = result.response.text();
+    const recommendations = await runAssistant({
+      systemPrompt: SYSTEM_PROMPT,
+      assistantType: 'worker-job-recommendations',
+      userId: req.user.id,
+      question,
+    });
 
     return res.json({
       message: 'Job recommendations generated',
@@ -264,22 +357,17 @@ Please provide:
  */
 exports.employerHelper = async (req, res) => {
   try {
-    const { question } = req.body;
-    if (!question || typeof question !== 'string' || question.trim().length === 0) {
-      return res.status(400).json({ message: 'Question is required' });
+    const question = validateQuestion(req, res);
+    if (!question) {
+      return;
     }
 
-    const userId = req.user.id;
-    const history = getMemory(userId);
-    const prompt = buildPrompt(EMPLOYER_SYSTEM_PROMPT, history, question.trim());
-
-    const model = getModel();
-    const result = await model.generateContent(prompt);
-    const answer = result.response.text();
-
-    history.push({ role: 'user', text: question.trim() });
-    history.push({ role: 'assistant', text: answer });
-    trimMemory(history);
+    const answer = await runAssistant({
+      systemPrompt: EMPLOYER_SYSTEM_PROMPT,
+      assistantType: 'employer-helper',
+      userId: req.user.id,
+      question,
+    });
 
     return res.json({
       message: 'Response generated successfully',

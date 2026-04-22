@@ -1,6 +1,5 @@
 package com.example.verson1;
 
-import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,8 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -66,34 +66,53 @@ public class AIMessageAdapter extends RecyclerView.Adapter<AIMessageAdapter.Mess
 
         private TextView messageText;
         private TextView timestamp;
-        private CardView messageCard;
+        private TextView senderLabel;
+        private MaterialCardView messageCard;
 
         MessageViewHolder(@NonNull View itemView) {
             super(itemView);
             messageText = itemView.findViewById(R.id.message_text);
             timestamp = itemView.findViewById(R.id.timestamp);
+            senderLabel = itemView.findViewById(R.id.sender_label);
             messageCard = itemView.findViewById(R.id.message_card);
         }
 
         void bind(AIMessage message) {
-            // Set message text
             messageText.setText(message.getContent());
             messageText.setMovementMethod(LinkMovementMethod.getInstance());
-
-            // Set timestamp
             timestamp.setText(message.getFormattedTime());
+            senderLabel.setText(message.getSender());
 
-            // Style based on message type
             if (message.isUserMessage()) {
                 messageCard.setCardBackgroundColor(itemView.getContext().getColor(R.color.user_message_bg));
                 messageText.setTextColor(itemView.getContext().getColor(R.color.user_message_text));
+                timestamp.setTextColor(itemView.getContext().getColor(R.color.user_message_text));
+                senderLabel.setTextColor(itemView.getContext().getColor(R.color.ai_text_subtle));
+                messageCard.setStrokeColor(itemView.getContext().getColor(android.R.color.transparent));
+                messageCard.setStrokeWidth(0);
             } else if (message.isErrorMessage()) {
                 messageCard.setCardBackgroundColor(itemView.getContext().getColor(R.color.error_message_bg));
                 messageText.setTextColor(itemView.getContext().getColor(R.color.error_message_text));
+                timestamp.setTextColor(itemView.getContext().getColor(R.color.error_message_text));
+                senderLabel.setTextColor(itemView.getContext().getColor(R.color.error_message_text));
+                messageCard.setStrokeColor(itemView.getContext().getColor(R.color.ai_error_stroke));
+                messageCard.setStrokeWidth(2);
             } else {
                 messageCard.setCardBackgroundColor(itemView.getContext().getColor(R.color.bot_message_bg));
                 messageText.setTextColor(itemView.getContext().getColor(R.color.bot_message_text));
+                timestamp.setTextColor(itemView.getContext().getColor(R.color.ai_text_subtle));
+                senderLabel.setTextColor(itemView.getContext().getColor(R.color.ai_text_subtle));
+                messageCard.setStrokeColor(itemView.getContext().getColor(R.color.ai_stroke));
+                messageCard.setStrokeWidth(1);
             }
+
+            itemView.setAlpha(0f);
+            itemView.setTranslationY(18f);
+            itemView.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setDuration(180)
+                    .start();
         }
     }
 }

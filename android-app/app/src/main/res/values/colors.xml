@@ -100,4 +100,20 @@
     <color name="switch_track_color">#CBD5E1</color>
     <color name="circle_status_available">#22C55E</color>
     <color name="circle_status_busy">#EF4444</color>
+
+    <!-- AI surfaces -->
+    <color name="ai_bg_top">#FFF3EC</color>
+    <color name="ai_bg_bottom">#EEF5FF</color>
+    <color name="ai_surface">#FDFEFF</color>
+    <color name="ai_surface_strong">#FFFFFF</color>
+    <color name="ai_surface_tint">#F7F9FC</color>
+    <color name="ai_stroke">#D9E3F0</color>
+    <color name="ai_orange_start">#FF7A45</color>
+    <color name="ai_orange_end">#FF5A36</color>
+    <color name="ai_blue_soft">#EAF2FF</color>
+    <color name="ai_text_subtle">#6B7A90</color>
+    <color name="ai_chip_bg">#FFF7F3</color>
+    <color name="ai_chip_stroke">#FFC5B2</color>
+    <color name="ai_chip_text">#B34724</color>
+    <color name="ai_error_stroke">#F6B5B5</color>
 </resources>

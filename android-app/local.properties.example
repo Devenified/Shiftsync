@@ -1,0 +1,4 @@
+# Copy this file to local.properties on your machine and update the values.
+# Use double backslashes on Windows.
+sdk.dir=C:\\Users\\Abhishek\\AppData\\Local\\Android\\Sdk
+api.base.url=http://10.0.2.2:3000
