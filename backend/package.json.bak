@@ -1,0 +1,24 @@
+{
+  "name": "shiftsync-backend",
+  "version": "1.0.0",
+  "description": "Simple Express backend with MVC structure for Shiftsync",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@google/generative-ai": "^0.3.1",
+    "@langchain/core": "^1.1.36",
+    "@langchain/google-genai": "^2.1.26",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.3",
+    "langchain": "^1.2.37",
+    "mongoose": "^9.2.1"
+  }
+}

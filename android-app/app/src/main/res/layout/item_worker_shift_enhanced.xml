@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="4dp"
+    android:layout_marginVertical="8dp"
+    app:cardBackgroundColor="#FFFFFF"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/card_inner_padding">
+
+        <!-- Title + Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/shift_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_subtitle"
+                android:textStyle="bold"
+                tools:text="Office Painting Work" />
+
+            <TextView
+                android:id="@+id/shift_status_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/status_background_assigned"
+                android:paddingHorizontal="14dp"
+                android:paddingVertical="6dp"
+                android:textColor="#FFFFFF"
+                android:textSize="@dimen/text_status_badge"
+                android:textStyle="bold"
+                tools:text="ASSIGNED" />
+        </LinearLayout>
+
+        <!-- Location + Date -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_mylocation"
+                app:tint="@color/text_medium" />
+
+            <TextView
+                android:id="@+id/shift_location"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:textColor="@color/text_medium"
+                android:textSize="@dimen/text_caption"
+                tools:text="Whitefield, Bangalore" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                app:tint="@color/text_medium" />
+
+            <TextView
+                android:id="@+id/shift_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textColor="@color/text_medium"
+                android:textSize="@dimen/text_caption"
+                tools:text="Mar 26" />
+        </LinearLayout>
+
+        <!-- Skills + Time -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_menu_preferences"
+                app:tint="@color/brand_orange" />
+
+            <TextView
+                android:id="@+id/shift_skills"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:textColor="@color/brand_orange"
+                android:textSize="@dimen/text_caption"
+                android:textStyle="bold"
+                tools:text="Painting, Wall Prep" />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="12dp"
+                android:src="@android:drawable/ic_menu_recent_history"
+                app:tint="@color/text_medium" />
+
+            <TextView
+                android:id="@+id/shift_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:textColor="@color/text_medium"
+                android:textSize="@dimen/text_caption"
+                tools:text="9AM-6PM" />
+        </LinearLayout>
+
+        <!-- Application Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/ic_dialog_info"
+                app:tint="@color/text_medium" />
+
+            <TextView
+                android:id="@+id/application_status"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:textColor="@color/status_available"
+                android:textSize="@dimen/text_caption"
+                tools:text="Application: Selected" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="14dp"
+            android:background="@color/card_border" />
+
+        <!-- Wage + Action -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Daily Wage"
+                    android:textColor="@color/text_medium"
+                    android:textSize="@dimen/text_caption" />
+
+                <TextView
+                    android:id="@+id/shift_wage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/status_money"
+                    android:textSize="@dimen/text_money_medium"
+                    android:textStyle="bold"
+                    tools:text="₹ 1,200" />
+            </LinearLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_action"
+                style="@style/Widget.ShiftSync.Button.Outlined"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/touch_target_min"
+                android:paddingHorizontal="20dp"
+                android:text="View Details"
+                android:textSize="@dimen/text_body" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+
+    <!-- Background gradient circle -->
+    <path
+        android:fillColor="#FC4C02"
+        android:pathData="M60,10 C87.6,10 110,32.4 110,60 C110,87.6 87.6,110 60,110 C32.4,110 10,87.6 10,60 C10,32.4 32.4,10 60,10 Z" />
+
+    <!-- Inner circle for depth -->
+    <path
+        android:fillColor="#E63E00"
+        android:pathData="M60,20 C82.1,20 100,37.9 100,60 C100,82.1 82.1,100 60,100 C37.9,100 20,82.1 20,60 C20,37.9 37.9,20 60,20 Z" />
+
+    <!-- Modern S letter with curves -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M45,35 L75,35 C78.3,35 81,37.7 81,41 C81,44.3 78.3,47 75,47 L55,47 C53.3,47 52,48.3 52,50 C52,51.7 53.3,53 55,53 L70,53 C73.3,53 76,55.7 76,59 C76,62.3 73.3,65 70,65 L55,65 C53.3,65 52,66.3 52,68 C52,69.7 53.3,71 55,71 L75,71 C78.3,71 81,73.7 81,77 C81,80.3 78.3,83 75,83 L45,83 C41.7,83 39,80.3 39,77 L39,41 C39,37.7 41.7,35 45,35 Z" />
+
+    <!-- Sync arrows -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,50 L90,45 L95,50 L92,50 L92,55 L88,55 L88,50 Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,70 L90,75 L95,70 L92,70 L92,65 L88,65 L88,70 Z" />
+
+    <!-- Connection dots -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,45 m-2,0 a2,2 0,1,1 4,0 a2,2 0,1,1 -4,0" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M30,75 m-2,0 a2,2 0,1,1 4,0 a2,2 0,1,1 -4,0" />
+
+    <!-- Modern accent lines -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeColor="#FFFFFF"
+        android:pathData="M25,60 L35,60" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:strokeWidth="1"
+        android:strokeColor="#FFFFFF"
+        android:pathData="M85,60 L95,60" />
+
+</vector>

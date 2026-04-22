@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="false">
+    
+    <!-- Frame 1 - Standing -->
+    <item android:duration="150">
+        <vector
+            android:width="80dp"
+            android:height="80dp"
+            android:viewportWidth="80"
+            android:viewportHeight="80">
+            <path
+                android:fillColor="#FC4C02"
+                android:pathData="M40,40 m-40,0 a40,40 0,1,1 80,0 a40,40 0,1,1 -80,0"/>
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M25,20 L25,25 L30,25 L30,20 Z M20,30 L25,30 L25,40 L30,40 L30,30 L35,30 L35,40 L40,40 L40,30 L45,30 L45,40 L50,40 L50,30 L55,30 L55,40 L55,45 L50,45 L50,50 L45,50 L45,45 L40,45 L40,50 L35,50 L35,45 L30,45 L30,50 L25,50 L25,45 L20,45 L20,40 L15,40 L15,30 Z"/>
+        </vector>
+    </item>
+    
+    <!-- Frame 2 - Right leg forward -->
+    <item android:duration="150">
+        <vector
+            android:width="80dp"
+            android:height="80dp"
+            android:viewportWidth="80"
+            android:viewportHeight="80">
+            <path
+                android:fillColor="#FC4C02"
+                android:pathData="M40,40 m-40,0 a40,40 0,1,1 80,0 a40,40 0,1,1 -80,0"/>
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M25,20 L25,25 L30,25 L30,20 Z M20,30 L25,30 L25,40 L30,40 L30,30 L35,30 L35,40 L40,40 L40,30 L45,30 L45,40 L50,40 L50,30 L55,30 L55,40 L55,45 L50,45 L50,50 L45,50 L45,45 L40,45 L40,50 L35,50 L35,45 L30,45 L30,50 L25,50 L25,45 L20,45 L20,40 L15,40 L15,30 Z"/>
+        </vector>
+    </item>
+    
+    <!-- Frame 3 - Left leg forward -->
+    <item android:duration="150">
+        <vector
+            android:width="80dp"
+            android:height="80dp"
+            android:viewportWidth="80"
+            android:viewportHeight="80">
+            <path
+                android:fillColor="#FC4C02"
+                android:pathData="M40,40 m-40,0 a40,40 0,1,1 80,0 a40,40 0,1,1 -80,0"/>
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M25,20 L25,25 L30,25 L30,20 Z M20,30 L25,30 L25,40 L30,40 L30,30 L35,30 L35,40 L40,40 L40,30 L45,30 L45,40 L50,40 L50,30 L55,30 L55,40 L55,45 L50,45 L50,50 L45,50 L45,45 L40,45 L40,50 L35,50 L35,45 L30,45 L30,50 L25,50 L25,45 L20,45 L20,40 L15,40 L15,30 Z"/>
+        </vector>
+    </item>
+    
+    <!-- Frame 4 - Running position -->
+    <item android:duration="150">
+        <vector
+            android:width="80dp"
+            android:height="80dp"
+            android:viewportWidth="80"
+            android:viewportHeight="80">
+            <path
+                android:fillColor="#FC4C02"
+                android:pathData="M40,40 m-40,0 a40,40 0,1,1 80,0 a40,40 0,1,1 -80,0"/>
+            <path
+                android:fillColor="#FFFFFF"
+                android:pathData="M25,20 L25,25 L30,25 L30,20 Z M20,30 L25,30 L25,40 L30,40 L30,30 L35,30 L35,40 L40,40 L40,30 L45,30 L45,40 L50,40 L50,30 L55,30 L55,40 L55,45 L50,45 L50,50 L45,50 L45,45 L40,45 L40,50 L35,50 L35,45 L30,45 L30,50 L25,50 L25,45 L20,45 L20,40 L15,40 L15,30 Z"/>
+        </vector>
+    </item>
+</animation-list>
