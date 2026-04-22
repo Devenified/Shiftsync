@@ -59,7 +59,11 @@ public class EmployerFindWorkersActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new WorkerSearchAdapter();
+        adapter = new WorkerSearchAdapter(workerId -> {
+            android.content.Intent intent = new android.content.Intent(this, WorkerPublicProfileActivity.class);
+            intent.putExtra(WorkerPublicProfileActivity.EXTRA_WORKER_ID, workerId);
+            startActivity(intent);
+        });
         recyclerView.setAdapter(adapter);
 
         findViewById(R.id.btn_search).setOnClickListener(v -> {
@@ -110,7 +114,12 @@ public class EmployerFindWorkersActivity extends AppCompatActivity {
                             Toast.makeText(this, "Could not read workers", Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(this, "Search failed", Toast.LENGTH_SHORT).show();
+                        try {
+                            String msg = new JSONObject(res.body).optString("message", "Search failed");
+                            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            Toast.makeText(this, "Search failed (" + res.code + ")", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             } catch (Exception e) {
@@ -124,7 +133,16 @@ public class EmployerFindWorkersActivity extends AppCompatActivity {
 
     private static class WorkerSearchAdapter extends RecyclerView.Adapter<WorkerSearchAdapter.VH> {
 
+        interface OnWorkerClick {
+            void onClick(String workerId);
+        }
+
         private final List<JSONObject> items = new ArrayList<>();
+        private final OnWorkerClick onWorkerClick;
+
+        WorkerSearchAdapter(OnWorkerClick onWorkerClick) {
+            this.onWorkerClick = onWorkerClick;
+        }
 
         void setItems(List<JSONObject> data) {
             items.clear();
@@ -158,13 +176,20 @@ public class EmployerFindWorkersActivity extends AppCompatActivity {
             boolean avail = w.optBoolean("isAvailable", false);
             holder.details.setText(
                     skillsStr
-                            + " · "
+                            + " • "
                             + loc
-                            + " · ★ "
+                            + " • Rating "
                             + rating
-                            + (avail ? " · Available" : "")
+                            + (avail ? " • Available" : "")
             );
             holder.phone.setText(w.optString("phoneNumber", ""));
+
+            final String workerId = w.optString("id", w.optString("_id", ""));
+            holder.itemView.setOnClickListener(v -> {
+                if (onWorkerClick != null && workerId != null && !workerId.isEmpty()) {
+                    onWorkerClick.onClick(workerId);
+                }
+            });
         }
 
         @Override

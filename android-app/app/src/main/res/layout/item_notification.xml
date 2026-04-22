@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="@dimen/card_corner_radius_large"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:id="@+id/root"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_surface_panel"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <FrameLayout
+            android:layout_width="@dimen/icon_card_action"
+            android:layout_height="@dimen/icon_card_action"
+            android:background="@drawable/bg_icon_container_primary">
+
+            <ImageView
+                android:id="@+id/iv_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_bell_modern"
+                app:tint="@color/brand_primary" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:text="Notification title"
+                android:textColor="@color/text_primary"
+                android:textSize="@dimen/text_body"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tv_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:text="Message"
+                android:textColor="@color/text_secondary"
+                android:textSize="@dimen/text_caption" />
+
+            <TextView
+                android:id="@+id/tv_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/text_muted"
+                android:textSize="@dimen/text_caption" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/dot_unread"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_notification_dot"
+            android:visibility="gone" />
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

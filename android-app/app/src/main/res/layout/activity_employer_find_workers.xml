@@ -4,16 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main"
+    android:background="@drawable/bg_screen_gradient"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="@dimen/screen_padding_horizontal">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:layout_marginBottom="12dp"
-        android:background="@color/brand_orange"
+        android:background="@drawable/bg_hero_gradient"
         app:menu="@menu/menu_toolbar_sign_out"
         app:navigationIconTint="#FFFFFF"
         app:navigationIcon="?attr/homeAsUpIndicator"
@@ -28,13 +28,13 @@
         android:baselineAligned="false">
         
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.ShiftSync.TextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:hint="Skill"
-            app:boxStrokeColor="@color/brand_orange">
+            app:startIconDrawable="@drawable/ic_sparkles_modern">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/skill_filter"
@@ -44,12 +44,12 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.ShiftSync.TextInputLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:hint="Location"
-            app:boxStrokeColor="@color/brand_orange">
+            app:startIconDrawable="@drawable/ic_location_modern">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/location_filter"
@@ -66,17 +66,18 @@
         android:layout_marginTop="8dp"
         android:text="Available only"
         android:textColor="@color/text_medium"
-        app:thumbTint="@color/brand_orange"
-        app:trackTint="@color/brand_orange" />
+        app:thumbTint="@color/brand_primary"
+        app:trackTint="@color/bg_dim" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_search"
+        style="@style/Widget.ShiftSync.Button.Primary"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/button_height_standard"
         android:layout_marginTop="12dp"
-        android:backgroundTint="@color/brand_orange"
         android:text="Search"
-        android:textColor="@color/text_primary" />
+        app:icon="@drawable/ic_search_modern"
+        app:iconTint="#FFFFFF" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_workers"
@@ -91,6 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:indeterminateTint="@color/brand_primary"
         android:visibility="gone" />
 
 </LinearLayout>

@@ -15,4 +15,7 @@ router.post('/job-recommendations', authMiddleware, requireRole('worker'), aiCon
 // Employer-specific AI helper
 router.post('/employer-helper', authMiddleware, requireRole('employer'), aiController.employerHelper);
 
+// Health / capability probe (public)
+router.get('/health', aiController.health);
+
 module.exports = router;

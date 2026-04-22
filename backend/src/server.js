@@ -22,6 +22,7 @@ const activityRouter = require('./routes/activity');
 const notificationRouter = require('./routes/notification');
 const chatRouter = require('./routes/chat');
 const aiRouter = require('./routes/ai');
+const analyticsRouter = require('./routes/analytics');
 
 app.use('/', homeRouter);
 app.use('/api/users', userRouter);
@@ -32,6 +33,7 @@ app.use('/api/activity', activityRouter);
 app.use('/api/notifications', notificationRouter);
 app.use('/api/chat', chatRouter);
 app.use('/api/ai', aiRouter);
+app.use('/api/analytics', analyticsRouter);
 
 // Fallback 404
 app.use((req, res) => {

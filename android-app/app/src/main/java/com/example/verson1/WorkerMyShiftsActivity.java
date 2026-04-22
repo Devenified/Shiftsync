@@ -13,8 +13,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -25,6 +27,9 @@ import java.util.List;
 public class WorkerMyShiftsActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
+    private RecyclerView recyclerView;
+    private TextView emptyText;
+    private SwipeRefreshLayout swipeRefresh;
     private MyShiftAdapter adapter;
     private String token;
 
@@ -48,22 +53,36 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
             toolbar.setNavigationOnClickListener(v -> finish());
             LogoutUiHelper.attachSignOutMenu(this, toolbar);
         }
-        RecyclerView recyclerView = findViewById(R.id.list);
+        recyclerView = findViewById(R.id.list);
         progressBar = findViewById(R.id.progress);
+        emptyText = findViewById(R.id.empty_text);
+        swipeRefresh = findViewById(R.id.swipe_refresh);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MyShiftAdapter();
         recyclerView.setAdapter(adapter);
 
+        swipeRefresh.setColorSchemeResources(R.color.brand_primary, R.color.brand_secondary);
+        swipeRefresh.setOnRefreshListener(this::loadMyShifts);
+
+        loadMyShifts();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
         loadMyShifts();
     }
 
     private void loadMyShifts() {
-        progressBar.setVisibility(View.VISIBLE);
+        if (!swipeRefresh.isRefreshing()) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         new Thread(() -> {
             try {
                 ApiClient.HttpResult res = ApiClient.get("/api/shifts/worker/my", token);
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
+                    swipeRefresh.setRefreshing(false);
                     if (res.code == 200) {
                         try {
                             JSONArray arr = new JSONObject(res.body).getJSONArray("shifts");
@@ -71,7 +90,21 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
                             for (int i = 0; i < arr.length(); i++) {
                                 list.add(arr.getJSONObject(i));
                             }
+                            // Put assigned (upcoming) shifts first for a "booking-style" feel.
+                            list.sort((a, b) -> {
+                                String sa = a.optString("status", "");
+                                String sb = b.optString("status", "");
+                                if ("assigned".equals(sa) && !"assigned".equals(sb)) return -1;
+                                if (!"assigned".equals(sa) && "assigned".equals(sb)) return 1;
+                                // Secondary sort by date/time strings (best-effort)
+                                String da = a.optString("shiftDate", "");
+                                String db = b.optString("shiftDate", "");
+                                int d = da.compareTo(db);
+                                if (d != 0) return d;
+                                return a.optString("startTime", "").compareTo(b.optString("startTime", ""));
+                            });
                             adapter.setItems(list);
+                            updateEmptyState(list.isEmpty());
                         } catch (Exception e) {
                             Toast.makeText(this, "Could not read shifts", Toast.LENGTH_SHORT).show();
                         }
@@ -82,10 +115,16 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
             } catch (Exception e) {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     progressBar.setVisibility(View.GONE);
+                    swipeRefresh.setRefreshing(false);
                     Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show();
                 });
             }
         }).start();
+    }
+
+    private void updateEmptyState(boolean isEmpty) {
+        if (emptyText != null) emptyText.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+        if (recyclerView != null) recyclerView.setVisibility(isEmpty ? View.GONE : View.VISIBLE);
     }
 
     private static String formatTime(String time24) {
@@ -93,14 +132,42 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
             String[] parts = time24.split(":");
             int hour = Integer.parseInt(parts[0]);
             int minute = Integer.parseInt(parts[1]);
-            
+
             String period = hour >= 12 ? "PM" : "AM";
             hour = hour % 12;
             if (hour == 0) hour = 12;
-            
+
             return String.format("%d:%02d %s", hour, minute, period);
         } catch (Exception e) {
             return time24;
+        }
+    }
+
+    private int getStatusColor(String status) {
+        switch (status.toLowerCase()) {
+            case "open":
+                return ContextCompat.getColor(this, R.color.brand_primary);
+            case "assigned":
+                return ContextCompat.getColor(this, R.color.brand_secondary);
+            case "completed":
+                return ContextCompat.getColor(this, R.color.status_available);
+            case "cancelled":
+                return ContextCompat.getColor(this, R.color.status_busy);
+            default:
+                return ContextCompat.getColor(this, R.color.text_medium);
+        }
+    }
+
+    private int getStatusBackground(String status) {
+        switch (status.toLowerCase()) {
+            case "open":
+                return R.drawable.status_background_open;
+            case "assigned":
+                return R.drawable.status_background_assigned;
+            case "completed":
+                return R.drawable.status_background_assigned;
+            default:
+                return R.drawable.status_background_assigned;
         }
     }
 
@@ -111,61 +178,54 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
         void setItems(List<JSONObject> data) {
             items.clear();
             items.addAll(data);
-            notifyDataSetChanged();
+            // Avoid RecyclerView "computing layout" crashes on fast refreshes.
+            try {
+                notifyDataSetChanged();
+            } catch (Exception ignored) {
+            }
         }
 
         @NonNull
         @Override
         public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_worker_shift_enhanced, parent, false);
+            View v = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_worker_shift_enhanced, parent, false);
             return new VH(v);
         }
 
         @Override
         public void onBindViewHolder(@NonNull VH holder, int position) {
             JSONObject shift = items.get(position);
-            
-            // Update with enhanced layout fields
+
             holder.title.setText(shift.optString("title", "Shift"));
-            
-            // Set location, date, and time
             holder.location.setText(shift.optString("location", ""));
             holder.date.setText(shift.optString("shiftDate", ""));
-            
-            // Format time from startTime and endTime
+
             String startTime = shift.optString("startTime", "");
             String endTime = shift.optString("endTime", "");
             if (!startTime.isEmpty() && !endTime.isEmpty()) {
-                // Convert 24-hour format to 12-hour format
                 String formattedStart = formatTime(startTime);
                 String formattedEnd = formatTime(endTime);
-                holder.time.setText(formattedStart + "-" + formattedEnd);
+                holder.time.setText(formattedStart + " - " + formattedEnd);
             } else {
                 holder.time.setText("Full Day");
             }
-            
-            // Set skills
+
             holder.skills.setText(shift.optString("skillRequired", ""));
-            
-            // Set wage
+
             double wage = shift.optDouble("wage", 0);
-            holder.wage.setText("₹" + (int) wage);
-            
-            // Set status and application status
+            holder.wage.setText("\u20B9" + (int) wage);
+
             String status = shift.optString("status", "");
             String appStatus = shift.optString("applicationStatus", "null");
             if ("null".equals(appStatus)) {
-                appStatus = "—";
+                appStatus = "Pending";
             }
-            
-            // Update status badge
+
             holder.statusBadge.setText(status.toUpperCase());
-            holder.statusBadge.setBackgroundResource(R.drawable.status_background_assigned);
-            
-            // Update application status
+            holder.statusBadge.setBackgroundResource(getStatusBackground(status));
             holder.applicationStatus.setText("Application: " + appStatus);
-            
-            // Set action button text
+
             holder.actionButton.setText("View Details");
             holder.actionButton.setOnClickListener(v -> showShiftDetailsDialog(shift));
         }
@@ -177,7 +237,9 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
             String date = shift.optString("shiftDate", "N/A");
             String startTime = shift.optString("startTime", "");
             String endTime = shift.optString("endTime", "");
-            String rawTime = (startTime.isEmpty() || endTime.isEmpty()) ? "Full Day" : formatTime(startTime) + " - " + formatTime(endTime);
+            String rawTime = (startTime.isEmpty() || endTime.isEmpty())
+                    ? "Full Day"
+                    : formatTime(startTime) + " - " + formatTime(endTime);
             String skills = shift.optString("skillRequired", "None");
             double wage = shift.optDouble("wage", 0);
             String status = shift.optString("status", "").toUpperCase();
@@ -186,13 +248,13 @@ public class WorkerMyShiftsActivity extends AppCompatActivity {
             String displayStatus = "null".equalsIgnoreCase(appStatus) ? "None" : appStatus;
 
             String message = "Date: " + date + "\n" +
-                             "Time: " + rawTime + "\n" +
-                             "Location: " + location + "\n" +
-                             "Skills: " + skills + "\n" +
-                             "Wage: ₹" + (int)wage + "\n\n" +
-                             "Status: " + status + "\n" +
-                             "Your Application: " + displayStatus + "\n\n" +
-                             "Description:\n" + desc;
+                    "Time: " + rawTime + "\n" +
+                    "Location: " + location + "\n" +
+                    "Skills: " + skills + "\n" +
+                    "Wage: \u20B9" + (int) wage + "\n\n" +
+                    "Status: " + status + "\n" +
+                    "Your Application: " + displayStatus + "\n\n" +
+                    "Description:\n" + desc;
 
             new androidx.appcompat.app.AlertDialog.Builder(WorkerMyShiftsActivity.this)
                     .setTitle(title)

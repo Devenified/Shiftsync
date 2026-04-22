@@ -6,7 +6,21 @@ const notificationSchema = new mongoose.Schema(
     message: { type: String, required: true },
     type: {
       type: String,
-      enum: ['shift_change', 'swap_approval', 'leave_approval', 'announcement', 'chat'],
+      enum: [
+        'shift_change',
+        'shift_assignment',
+        'shift_created',
+        'shift_updated',
+        'shift_cancelled',
+        'swap_request',
+        'swap_approved',
+        'swap_rejected',
+        'leave_request',
+        'leave_approved',
+        'leave_rejected',
+        'announcement',
+        'chat'
+      ],
       required: true
     },
     read: { type: Boolean, default: false },

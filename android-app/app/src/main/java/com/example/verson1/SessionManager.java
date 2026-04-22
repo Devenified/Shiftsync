@@ -15,8 +15,6 @@ public final class SessionManager {
     public static final String PREFS_NAME = "ShiftSyncPrefs";
     public static final String TOKEN_KEY = "auth_token";
     public static final String ROLE_KEY = "user_role";
-    public static final String BASE_URL = "http://10.87.0.168:3000";
-
     public static final String ROLE_WORKER = "worker";
     public static final String ROLE_EMPLOYER = "employer";
 
@@ -154,7 +152,7 @@ public final class SessionManager {
             return true;
         }
         if (isWorker(activity)) {
-            activity.startActivity(new Intent(activity, WorkerDashboardCompleteActivity.class));
+            activity.startActivity(new Intent(activity, WorkerDashboardNewActivity.class));
             activity.finish();
             return false;
         }

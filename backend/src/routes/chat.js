@@ -5,5 +5,6 @@ const { authMiddleware } = require('../lib/jwt');
 
 router.post('/send', authMiddleware, chatController.sendMessage);
 router.get('/messages', authMiddleware, chatController.getMessages);
+router.get('/threads', authMiddleware, chatController.listThreads);
 
 module.exports = router;

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main"
+    android:background="@drawable/bg_screen_gradient"
     android:fillViewport="true">
 
     <LinearLayout
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginBottom="16dp"
-            android:background="@color/brand_orange"
+            android:background="@drawable/bg_hero_gradient"
             app:menu="@menu/menu_toolbar_sign_out"
             app:navigationIconTint="#FFFFFF"
             app:navigationIcon="?attr/homeAsUpIndicator"
@@ -28,17 +28,11 @@
 
         <!-- Skills -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.ShiftSync.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Skills (comma separated)"
-            app:boxStrokeColor="@color/brand_orange"
-            app:boxBackgroundColor="#FFFFFF"
-            app:boxCornerRadiusBottomEnd="14dp"
-            app:boxCornerRadiusBottomStart="14dp"
-            app:boxCornerRadiusTopEnd="14dp"
-            app:boxCornerRadiusTopStart="14dp"
-            app:hintTextColor="@color/brand_orange">
+            app:startIconDrawable="@drawable/ic_sparkles_modern">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/skills_input"
@@ -52,18 +46,12 @@
 
         <!-- Location -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.ShiftSync.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Location"
-            app:boxStrokeColor="@color/brand_orange"
-            app:boxBackgroundColor="#FFFFFF"
-            app:boxCornerRadiusBottomEnd="14dp"
-            app:boxCornerRadiusBottomStart="14dp"
-            app:boxCornerRadiusTopEnd="14dp"
-            app:boxCornerRadiusTopStart="14dp"
-            app:hintTextColor="@color/brand_orange">
+            app:startIconDrawable="@drawable/ic_location_modern">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/location_input"
@@ -77,18 +65,12 @@
 
         <!-- Experience -->
         <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="@style/Widget.ShiftSync.TextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:hint="Years of Experience"
-            app:boxStrokeColor="@color/brand_orange"
-            app:boxBackgroundColor="#FFFFFF"
-            app:boxCornerRadiusBottomEnd="14dp"
-            app:boxCornerRadiusBottomStart="14dp"
-            app:boxCornerRadiusTopEnd="14dp"
-            app:boxCornerRadiusTopStart="14dp"
-            app:hintTextColor="@color/brand_orange">
+            app:startIconDrawable="@drawable/ic_clock_modern">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/experience_input"
@@ -116,7 +98,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:indeterminateTint="@color/brand_orange"
+            android:indeterminateTint="@color/brand_primary"
             android:visibility="gone" />
 
         <!-- Save button -->

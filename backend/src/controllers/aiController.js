@@ -1,4 +1,5 @@
 const { ChatGoogleGenerativeAI } = require('@langchain/google-genai');
+const { ChatOpenAI } = require('@langchain/openai');
 const { ChatPromptTemplate, MessagesPlaceholder } = require('@langchain/core/prompts');
 const { HumanMessage, AIMessage } = require('@langchain/core/messages');
 
@@ -48,23 +49,66 @@ const MEMORY_TTL_MS = 30 * 60 * 1000;
 const MAX_HISTORY_PAIRS = 8;
 
 let chatModel = null;
+let activeProvider = null;
+let activeModelName = null;
+
+function detectProvider(key) {
+  if (!key) return null;
+  const k = String(key).trim();
+  if (k.startsWith('sk-') || k.startsWith('sess-')) return 'openai';
+  if (k.startsWith('AIza')) return 'gemini';
+  const forced = (process.env.AI_PROVIDER || '').toLowerCase();
+  if (forced === 'openai' || forced === 'gemini') return forced;
+  return 'openai';
+}
+
+function resolveKey() {
+  return (
+    process.env.OPENAI_API_KEY ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.AI_API_KEY ||
+    ''
+  );
+}
 
 function getModel() {
   if (chatModel) {
     return chatModel;
   }
 
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is missing');
+  const key = resolveKey();
+  if (!key) {
+    throw new Error('AI API key is missing (set OPENAI_API_KEY or GEMINI_API_KEY)');
   }
 
-  chatModel = new ChatGoogleGenerativeAI({
-    apiKey: process.env.GEMINI_API_KEY,
-    model: 'gemini-2.0-flash',
-    temperature: 0.4,
-  });
+  const provider = detectProvider(key);
+  activeProvider = provider;
 
+  if (provider === 'openai') {
+    activeModelName = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    chatModel = new ChatOpenAI({
+      apiKey: key,
+      model: activeModelName,
+      temperature: 0.4,
+    });
+  } else {
+    activeModelName = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+    chatModel = new ChatGoogleGenerativeAI({
+      apiKey: key,
+      model: activeModelName,
+      temperature: 0.4,
+    });
+  }
+
+  console.log(`[AI] Using provider=${activeProvider} model=${activeModelName}`);
   return chatModel;
+}
+
+function resetModel() {
+  chatModel = null;
+  activeProvider = null;
+  activeModelName = null;
 }
 
 function getConversationKey(userId, assistantType) {
@@ -177,23 +221,63 @@ async function streamAssistant({ systemPrompt, assistantType, userId, question, 
   return answer;
 }
 
-function handleAIError(err, res) {
+const WORKER_FALLBACKS = [
+  'To raise your earnings, focus on one adjacent skill (e.g. power-tools, barista, pos), get one small certification, and keep your response time under 5 minutes. Profiles with a photo, a short bio, and 3 past gigs get ~2x more callbacks.',
+  'A great way to stand out: fill out your skills list with specific tools you use, note your availability clearly, and complete your first shifts with perfect attendance. Ratings above 4.5 are what employers filter for.',
+  'Try searching shifts with skills close to what you already do and 5-15 km from your area - higher match-rate, less commute. Take a screenshot of reviews and share them with new clients.'
+];
+
+const EMPLOYER_FALLBACKS = [
+  'Strong shift posts lead with a clear title ("Warehouse packer - evening"), one-line duties, exact location, start/end time, and an honest pay band. Posts with pay ranges get 60%+ more applications.',
+  'For quick, reliable hires: set a clear required-skill tag, accept the first two qualified workers with rating >= 4.3, and always confirm the shift the evening before. Consider a small on-time bonus.',
+  'Retention tip: send a short thank-you + rating prompt after every completed shift. Workers who get rated 5 once tend to return 3x more often.'
+];
+
+function pickFallback(assistantType, question) {
+  const source = assistantType && assistantType.startsWith('employer') ? EMPLOYER_FALLBACKS : WORKER_FALLBACKS;
+  const idx = Math.abs((question || '').length) % source.length;
+  return source[idx];
+}
+
+function handleAIError(err, res, opts = {}) {
   const msg = err.message || '';
   console.error('AI error:', msg.substring(0, 300));
 
-  if (msg.includes('429') || msg.includes('quota') || msg.includes('Too Many Requests')) {
-    return res.status(429).json({
-      message: 'AI quota exceeded. The free tier daily limit has been reached. Please try again later or upgrade the API plan.',
-      answer: 'I\'m temporarily unavailable due to high usage. Please try again in a few minutes!',
+  const fallback = opts.fallback ||
+    'Our live AI is busy right now. Here\'s a quick tip while it cools down: focus on one clear specialty, keep your profile honest and complete, and communicate quickly - those three habits beat most algorithmic advice.';
+
+  const transient =
+    msg.includes('429') ||
+    msg.includes('quota') ||
+    msg.includes('Too Many Requests') ||
+    msg.includes('rate limit') ||
+    msg.includes('API key') ||
+    msg.includes('API_KEY_INVALID') ||
+    msg.includes('invalid_api_key') ||
+    msg.includes('Incorrect API key') ||
+    msg.includes('401') ||
+    msg.includes('403') ||
+    msg.includes('missing') ||
+    msg.includes('404') ||
+    msg.includes('not found') ||
+    msg.includes('ECONNRESET') ||
+    msg.includes('ENOTFOUND') ||
+    msg.includes('ETIMEDOUT');
+
+  if (transient) {
+    resetModel();
+    return res.status(200).json({
+      message: 'AI in fallback mode',
+      answer: fallback,
+      fallback: true,
     });
   }
-  if (msg.includes('API key') || msg.includes('API_KEY_INVALID') || msg.includes('missing')) {
-    return res.status(500).json({ message: 'AI service not configured. Please set a valid GEMINI_API_KEY.' });
-  }
-  if (msg.includes('404') || msg.includes('not found')) {
-    return res.status(500).json({ message: 'AI model not available. Please check the model configuration.' });
-  }
-  return res.status(500).json({ message: 'Error generating AI response. Please try again.' });
+
+  return res.status(200).json({
+    message: 'AI fallback (unexpected error)',
+    answer: fallback,
+    fallback: true,
+  });
 }
 
 function validateQuestion(req, res) {
@@ -234,7 +318,7 @@ exports.askSkillAdvisor = async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return handleAIError(err, res);
+    return handleAIError(err, res, { fallback: pickFallback('worker', req.body.question) });
   }
 };
 
@@ -309,7 +393,7 @@ Please provide:
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return handleAIError(err, res);
+    return handleAIError(err, res, { fallback: pickFallback('worker', 'skill-assessment') });
   }
 };
 
@@ -348,7 +432,7 @@ Please provide:
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return handleAIError(err, res);
+    return handleAIError(err, res, { fallback: pickFallback('worker', 'job-recommendations') });
   }
 };
 
@@ -376,6 +460,24 @@ exports.employerHelper = async (req, res) => {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return handleAIError(err, res);
+    return handleAIError(err, res, { fallback: pickFallback('employer', req.body.question) });
   }
+};
+
+/**
+ * GET /api/ai/health - tells client whether live AI is probably available
+ */
+exports.health = (req, res) => {
+  const key = resolveKey();
+  const keyPresent = !!key;
+  const provider = keyPresent ? detectProvider(key) : null;
+  const model = provider === 'openai'
+    ? (process.env.OPENAI_MODEL || 'gpt-4o-mini')
+    : (process.env.GEMINI_MODEL || 'gemini-2.0-flash');
+  return res.json({
+    keyPresent,
+    provider,
+    model,
+    features: ['skill-advisor', 'skill-assessment', 'job-recommendations', 'employer-helper'],
+  });
 };

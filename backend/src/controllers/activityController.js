@@ -6,7 +6,12 @@ exports.getFeed = async (req, res) => {
       .populate('user', 'fullName profilePhoto role')
       .sort({ timestamp: -1 })
       .limit(50);
-    return res.json({ feed });
+    return res.json({
+      feed: feed.map((item) => ({
+        ...item.toObject(),
+        description: item.action
+      }))
+    });
   } catch (err) {
     console.error('Get feed error', err);
     return res.status(500).json({ message: 'Internal server error' });

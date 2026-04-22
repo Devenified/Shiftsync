@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_worker_home"
-        android:icon="@android:drawable/ic_menu_today"
+        android:icon="@drawable/ic_home_modern"
         android:title="@string/nav_worker_home" />
     <item
         android:id="@+id/nav_worker_shifts"
-        android:icon="@android:drawable/ic_menu_agenda"
+        android:icon="@drawable/ic_calendar_modern"
         android:title="@string/nav_worker_shifts" />
     <item
         android:id="@+id/nav_worker_profile"
-        android:icon="@android:drawable/ic_menu_myplaces"
+        android:icon="@drawable/ic_person_modern"
         android:title="@string/nav_worker_profile" />
 </menu>

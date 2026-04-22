@@ -19,6 +19,10 @@ router.patch(
   shiftController.reviewApplication
 );
 router.patch('/:id/complete', authMiddleware, requireRole('employer'), shiftController.completeShift);
+router.patch('/:id', authMiddleware, requireRole('employer'), shiftController.updateShift);
+router.delete('/:id', authMiddleware, requireRole('employer'), shiftController.cancelShift);
+
+// Shared (auth) routes
+router.get('/:id', authMiddleware, shiftController.getShift);
 
 module.exports = router;
-

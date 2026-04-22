@@ -1,43 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Touch targets: Material min 48dp; primary actions 56dp+ -->
-    <dimen name="touch_target_min">48dp</dimen>
-    <dimen name="button_height_standard">56dp</dimen>
-    <dimen name="button_height_large">64dp</dimen>
-    <dimen name="button_height_dashboard">64dp</dimen>
-    <dimen name="button_corner_radius">16dp</dimen>
-
-    <!-- Screen padding -->
-    <dimen name="screen_padding_horizontal">20dp</dimen>
+    <!-- Screen Spacing -->
+    <dimen name="screen_padding_horizontal">16dp</dimen>
     <dimen name="screen_padding_vertical">16dp</dimen>
-    <dimen name="card_inner_padding">20dp</dimen>
 
-    <!-- Text sizes — accessible minimum 14sp everywhere -->
-    <dimen name="text_headline">28sp</dimen>
-    <dimen name="text_title">22sp</dimen>
-    <dimen name="text_subtitle">18sp</dimen>
-    <dimen name="text_body">16sp</dimen>
-    <dimen name="text_body_large">18sp</dimen>
-    <dimen name="text_caption">14sp</dimen>
-    <dimen name="text_money_large">36sp</dimen>
-    <dimen name="text_money_medium">24sp</dimen>
-    <dimen name="text_button">18sp</dimen>
-    <dimen name="button_text_size_dashboard">18sp</dimen>
-    <dimen name="text_nav_label">14sp</dimen>
-    <dimen name="text_status_badge">13sp</dimen>
+    <!-- Touch targets -->
+    <dimen name="touch_target_min">48dp</dimen>
+    <dimen name="button_height_small">44dp</dimen>
+    <dimen name="button_height_standard">52dp</dimen>
+    <dimen name="button_height_large">60dp</dimen>
+    <dimen name="button_height_dashboard">64dp</dimen>
+    <dimen name="button_corner_radius">28dp</dimen>
 
-    <!-- Icon sizes -->
-    <dimen name="icon_small">24dp</dimen>
-    <dimen name="icon_medium">32dp</dimen>
-    <dimen name="icon_large">48dp</dimen>
-    <dimen name="icon_nav">30dp</dimen>
-    <dimen name="icon_card_action">44dp</dimen>
-
-    <!-- Card sizes -->
-    <dimen name="card_corner_radius">16dp</dimen>
+    <!-- Card radii -->
+    <dimen name="card_corner_radius">28dp</dimen>
+    <dimen name="card_corner_radius_small">20dp</dimen>
+    <dimen name="card_corner_radius_large">36dp</dimen>
     <dimen name="card_elevation">4dp</dimen>
-    <dimen name="quick_action_card_height">140dp</dimen>
+    <dimen name="card_elevation_raised">8dp</dimen>
+    <dimen name="quick_action_card_height">130dp</dimen>
+    <dimen name="card_inner_padding">16dp</dimen>
 
     <!-- Toolbar -->
-    <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="toolbar_elevation">0dp</dimen>
+
+    <!-- Avatar sizes -->
+    <dimen name="avatar_small">36dp</dimen>
+    <dimen name="avatar_medium">52dp</dimen>
+    <dimen name="avatar_large">88dp</dimen>
+
+    <!-- Icons -->
+    <dimen name="icon_card_action">48dp</dimen>
+    <dimen name="icon_nav">24dp</dimen>
+
+    <!-- Typography -->
+    <dimen name="text_display">36sp</dimen>
+    <dimen name="text_headline">24sp</dimen>
+    <dimen name="text_title">20sp</dimen>
+    <dimen name="text_subtitle">16sp</dimen>
+    <dimen name="text_body">14sp</dimen>
+    <dimen name="text_body_large">16sp</dimen>
+    <dimen name="text_button">14sp</dimen>
+    <dimen name="text_caption">12sp</dimen>
+    <dimen name="text_money_large">32sp</dimen>
+    <dimen name="text_money_medium">24sp</dimen>
+    <dimen name="text_nav_label">11sp</dimen>
+    <dimen name="text_status_badge">10sp</dimen>
 </resources>

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main"
+    android:background="@drawable/bg_screen_gradient"
     android:fillViewport="true">
 
     <LinearLayout
@@ -17,7 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginBottom="16dp"
-            android:background="@color/brand_orange"
+            android:background="@drawable/bg_hero_gradient"
             app:menu="@menu/menu_toolbar_sign_out"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:navigationIconTint="#FFFFFF"
@@ -51,7 +51,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:textColor="@color/brand_orange"
+            android:textColor="@color/brand_primary"
             android:textSize="@dimen/text_subtitle" />
 
         <!-- Email -->
@@ -60,7 +60,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:drawableStart="@android:drawable/ic_dialog_email"
+            android:drawableStart="@drawable/ic_email_modern"
             android:drawablePadding="12dp"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_body" />
@@ -71,7 +71,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:drawableStart="@android:drawable/stat_sys_phone_call"
+            android:drawableStart="@drawable/ic_phone_modern"
             android:drawablePadding="12dp"
             android:textColor="@color/text_primary"
             android:textSize="@dimen/text_body" />
@@ -82,7 +82,7 @@
             android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginTop="20dp"
-            android:indeterminateTint="@color/brand_orange"
+            android:indeterminateTint="@color/brand_primary"
             android:visibility="gone" />
 
         <!-- Logout -->

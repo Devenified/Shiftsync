@@ -227,8 +227,7 @@ public class LoginVideoActivity extends AppCompatActivity {
     private void navigateByRole(String role) {
         Intent intent;
         if ("worker".equalsIgnoreCase(role)) {
-            // Use simpler dashboard for testing to isolate crash
-            intent = new Intent(this, WorkerDashboardCleanActivity.class);
+            intent = new Intent(this, WorkerDashboardNewActivity.class);
         } else {
             intent = new Intent(this, EmployerDashboardActivity.class);
         }

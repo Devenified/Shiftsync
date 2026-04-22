@@ -15,6 +15,9 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputEditText;
 
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.widget.VideoView;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -30,12 +33,16 @@ public class LoginActivity extends AppCompatActivity {
     private MaterialButton loginButton;
     private ProgressBar loadingIndicator;
     private TabLayout loginTabs;
+    private VideoView loginVideo;
 
     private static final String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Ensure backend base URL is reachable early.
+        new Thread(ApiClient::findWorkingIP).start();
 
         if (checkExistingSession()) return;
 
@@ -46,6 +53,23 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.btn_login);
         loadingIndicator = findViewById(R.id.progress_bar);
         loginTabs = findViewById(R.id.login_tabs);
+        loginVideo = findViewById(R.id.login_video);
+
+        if (loginVideo != null) {
+            String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.login_video;
+            loginVideo.setVideoURI(Uri.parse(videoPath));
+            loginVideo.setOnPreparedListener(mp -> {
+                mp.setLooping(true);
+                // Scale to center crop
+                float videoRatio = mp.getVideoWidth() / (float) mp.getVideoHeight();
+                float screenRatio = loginVideo.getWidth() / (float) loginVideo.getHeight();
+                float scaleX = videoRatio > screenRatio ? videoRatio / screenRatio : 1f;
+                float scaleY = videoRatio > screenRatio ? 1f : screenRatio / videoRatio;
+                loginVideo.setScaleX(scaleX);
+                loginVideo.setScaleY(scaleY);
+            });
+            loginVideo.start();
+        }
 
         if (loginTabs != null) {
             loginTabs.addTab(loginTabs.newTab().setText("Worker"));
@@ -57,6 +81,14 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.tv_sign_up).setOnClickListener(v -> {
             startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (loginVideo != null && !loginVideo.isPlaying()) {
+            loginVideo.start();
+        }
     }
 
     private boolean checkExistingSession() {
@@ -149,6 +181,7 @@ public class LoginActivity extends AppCompatActivity {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     loadingIndicator.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
+                    loginButton.setText("LOGIN");
                     
                     try {
                         JSONObject responseJson = new JSONObject(result);
@@ -175,6 +208,7 @@ public class LoginActivity extends AppCompatActivity {
                 new Handler(Looper.getMainLooper()).post(() -> {
                     loadingIndicator.setVisibility(View.GONE);
                     loginButton.setEnabled(true);
+                    loginButton.setText("LOGIN");
                     Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show();
                 });
             } finally {

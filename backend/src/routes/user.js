@@ -39,5 +39,13 @@ router.get(
   userController.searchWorkers
 );
 
+// Employer: view a worker profile by id
+router.get(
+  '/:id',
+  authMiddleware,
+  requireRole('employer'),
+  userController.getUserByIdForEmployer
+);
+
 module.exports = router;
 

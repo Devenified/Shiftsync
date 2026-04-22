@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,10 +52,9 @@ public class EmployerDashboardActivity extends AppCompatActivity {
         setupBottomNav();
         setupActivityFeed();
         
-        // Load data
         fetchEmployerDashboard();
         fetchUserProfile();
-        loadMockActivityData();
+        fetchActivityFeed();
         updateDateAndTime();
     }
     
@@ -76,6 +76,10 @@ public class EmployerDashboardActivity extends AppCompatActivity {
             int id = item.getItemId();
             if (id == R.id.action_account) {
                 startActivity(new Intent(this, EmployerProfileActivity.class));
+                return true;
+            }
+            if (id == R.id.action_notifications) {
+                startActivity(new Intent(this, NotificationsActivity.class));
                 return true;
             }
             return LogoutUiHelper.onMenuItemLogout(this, id);
@@ -102,6 +106,15 @@ public class EmployerDashboardActivity extends AppCompatActivity {
         fabPostShift.setOnClickListener(v -> {
             startActivity(new Intent(this, EmployerPostShiftActivity.class));
         });
+    }
+    
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updateDateAndTime();
+        fetchUserProfile();
+        fetchEmployerDashboard();
+        fetchActivityFeed();
     }
     
     private void setupBottomNav() {
@@ -132,39 +145,63 @@ public class EmployerDashboardActivity extends AppCompatActivity {
         activityFeed.setAdapter(activityFeedAdapter);
     }
     
-    private void loadMockActivityData() {
-        List<ActivityFeedAdapter.ActivityItem> activities = new ArrayList<>();
-        
-        // Add mock activities
-        activities.add(new ActivityFeedAdapter.ActivityItem(
-            "John swapped shift with Alex", 
-            "2 hours ago", 
-            "swap", 
-            android.R.drawable.ic_menu_myplaces
-        ));
-        
-        activities.add(new ActivityFeedAdapter.ActivityItem(
-            "Priya requested leave for March 28", 
-            "4 hours ago", 
-            "leave", 
-            android.R.drawable.ic_menu_myplaces
-        ));
-        
-        activities.add(new ActivityFeedAdapter.ActivityItem(
-            "Manager approved shift change", 
-            "6 hours ago", 
-            "approval", 
-            android.R.drawable.ic_menu_myplaces
-        ));
-        
-        activities.add(new ActivityFeedAdapter.ActivityItem(
-            "New team member Sarah joined", 
-            "1 day ago", 
-            "info", 
-            android.R.drawable.ic_menu_myplaces
-        ));
-        
-        activityFeedAdapter.setActivities(activities);
+    private void fetchActivityFeed() {
+        String token = SessionManager.getToken(this);
+        if (token == null) return;
+        new Thread(() -> {
+            try {
+                ApiClient.HttpResult res = ApiClient.get("/api/activity", token);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    try {
+                        if (res.code == 200) {
+                            JSONObject obj = new JSONObject(res.body);
+                            JSONArray feed = obj.optJSONArray("feed");
+                            if (feed == null) feed = new JSONArray();
+                            List<ActivityFeedAdapter.ActivityItem> list = new ArrayList<>();
+                            SimpleDateFormat in = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+                            for (int i = 0; i < Math.min(feed.length(), 10); i++) {
+                                JSONObject f = feed.getJSONObject(i);
+                                String desc = f.optString("description", "Activity");
+                                String type = f.optString("type", "info");
+                                String ts = f.optString("timestamp", f.optString("createdAt", ""));
+                                String time = ts;
+                                try {
+                                    if (ts.length() >= 19) {
+                                        Date d = in.parse(ts.substring(0, 19));
+                                        if (d != null) {
+                                            long diff = System.currentTimeMillis() - d.getTime();
+                                            long min = diff / 60000;
+                                            if (min < 1) time = "just now";
+                                            else if (min < 60) time = min + "m ago";
+                                            else if (min < 1440) time = (min / 60) + "h ago";
+                                            else time = (min / 1440) + "d ago";
+                                        }
+                                    }
+                                } catch (Exception ignored) { }
+                                int icon;
+                                switch (type) {
+                                    case "shift_swap": icon = R.drawable.ic_swap_modern; break;
+                                    case "leave_request": icon = R.drawable.ic_calendar_modern; break;
+                                    case "shift_assignment": icon = R.drawable.ic_briefcase_modern; break;
+                                    case "attendance": icon = R.drawable.ic_check_modern; break;
+                                    default: icon = R.drawable.ic_person_modern;
+                                }
+                                list.add(new ActivityFeedAdapter.ActivityItem(desc, time, type, icon));
+                            }
+                            activityFeedAdapter.setActivities(list);
+                        } else {
+                            activityFeedAdapter.setActivities(new ArrayList<>());
+                        }
+                    } catch (Exception e) {
+                        activityFeedAdapter.setActivities(new ArrayList<>());
+                    }
+                });
+            } catch (Exception e) {
+                new Handler(Looper.getMainLooper()).post(
+                        () -> activityFeedAdapter.setActivities(new ArrayList<>())
+                );
+            }
+        }).start();
     }
     
     private void updateDateAndTime() {
@@ -233,14 +270,23 @@ public class EmployerDashboardActivity extends AppCompatActivity {
                             JSONObject summary = jsonResponse.getJSONObject("summary");
                             
                             int activeShifts = summary.optInt("activeShifts", 0);
-                            int totalEmployees = summary.optInt("totalEmployees", 0);
+                            int totalEmployees = summary.optInt("totalWorkersEngaged", 0);
                             
                             activeShiftsCount.setText(String.valueOf(activeShifts));
                             teamMembersCount.setText(String.valueOf(totalEmployees));
-                            
-                            // Set mock next shift data
-                            nextShiftText.setText("Morning Shift");
-                            nextShiftTime.setText("Tomorrow, 8:00 AM - 4:00 PM");
+
+                            JSONObject nextShift = summary.optJSONObject("nextShift");
+                            if (nextShift != null) {
+                                nextShiftText.setText(nextShift.optString("title", "Upcoming shift"));
+                                nextShiftTime.setText(
+                                        nextShift.optString("shiftDate", "") + "  " +
+                                        nextShift.optString("startTime", "") + " - " +
+                                        nextShift.optString("endTime", "")
+                                );
+                            } else {
+                                nextShiftText.setText("No upcoming shifts");
+                                nextShiftTime.setText("Create a shift to get started");
+                            }
                             
                         } catch (Exception e) {
                             Log.e(TAG, "Error parsing dashboard summary", e);

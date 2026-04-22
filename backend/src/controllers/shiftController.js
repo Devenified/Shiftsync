@@ -98,6 +98,20 @@ exports.applyToShift = async (req, res) => {
     shift.applications.push({ worker: req.user.id, status: 'pending' });
     await shift.save();
 
+    await ActivityFeed.create({
+      user: req.user.id,
+      action: `applied for shift: ${shift.title}`,
+      type: 'shift_assignment',
+      relatedId: shift._id
+    });
+
+    await Notification.create({
+      userId: shift.employer,
+      message: `A new worker applied for "${shift.title}".`,
+      type: 'shift_assignment',
+      relatedId: shift._id
+    });
+
     return res.json({ message: 'Applied to shift successfully' });
   } catch (err) {
     console.error('Apply shift error', err);
@@ -109,8 +123,11 @@ exports.applyToShift = async (req, res) => {
 exports.listEmployerShifts = async (req, res) => {
   try {
     const shifts = await Shift.find({ employer: req.user.id })
-      .populate('assignedWorker', 'fullName email phoneNumber')
-      .populate('applications.worker', 'fullName email phoneNumber')
+      .populate('assignedWorker', 'fullName email phoneNumber rating completedShifts skills')
+      .populate(
+        'applications.worker',
+        'fullName email phoneNumber rating completedShifts skills experienceYears location isAvailable'
+      )
       .sort({ createdAt: -1 });
 
     return res.json({ shifts });
@@ -172,7 +189,7 @@ exports.reviewApplication = async (req, res) => {
     await Notification.create({
       userId: req.params.workerId,
       message: `Your application for ${shift.title} was ${decision}.`,
-      type: 'shift_change',
+      type: decision === 'accepted' ? 'shift_assignment' : 'shift_updated',
       relatedId: shift._id
     });
 
@@ -221,9 +238,120 @@ exports.completeShift = async (req, res) => {
       }
     });
 
+    await Notification.create({
+      userId: shift.assignedWorker,
+      message: `Your shift "${shift.title}" was marked as completed.`,
+      type: 'shift_updated',
+      relatedId: shift._id
+    });
+
     return res.json({ message: 'Shift marked as completed' });
   } catch (err) {
     console.error('Complete shift error', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// GET /api/shifts/:id  (employer who owns it, or worker who applied/assigned)
+exports.getShift = async (req, res) => {
+  try {
+    const shift = await Shift.findById(req.params.id)
+      .populate('employer', 'fullName companyName phoneNumber email')
+      .populate('assignedWorker', 'fullName phoneNumber rating')
+      .populate('applications.worker', 'fullName phoneNumber rating skills');
+    if (!shift) {
+      return res.status(404).json({ message: 'Shift not found' });
+    }
+    return res.json({ shift });
+  } catch (err) {
+    console.error('Get shift error', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// PATCH /api/shifts/:id (employer)
+exports.updateShift = async (req, res) => {
+  try {
+    const shift = await Shift.findById(req.params.id);
+    if (!shift) {
+      return res.status(404).json({ message: 'Shift not found' });
+    }
+    if (shift.employer.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You can only edit your own shifts' });
+    }
+    if (shift.status !== 'open') {
+      return res.status(400).json({ message: 'Only open shifts can be edited' });
+    }
+
+    const allowed = [
+      'title',
+      'description',
+      'skillRequired',
+      'location',
+      'shiftDate',
+      'startTime',
+      'endTime',
+      'wage'
+    ];
+    allowed.forEach((f) => {
+      if (req.body[f] !== undefined) {
+        shift[f] = req.body[f];
+      }
+    });
+    await shift.save();
+
+    return res.json({ message: 'Shift updated', shift });
+  } catch (err) {
+    console.error('Update shift error', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// DELETE /api/shifts/:id (employer) - cancels if open, else 400
+exports.cancelShift = async (req, res) => {
+  try {
+    const shift = await Shift.findById(req.params.id);
+    if (!shift) {
+      return res.status(404).json({ message: 'Shift not found' });
+    }
+    if (shift.employer.toString() !== req.user.id) {
+      return res.status(403).json({ message: 'You can only cancel your own shifts' });
+    }
+    if (shift.status === 'completed') {
+      return res.status(400).json({ message: 'Cannot cancel a completed shift' });
+    }
+
+    shift.status = 'cancelled';
+    await shift.save();
+
+    // Notify applicants and assigned worker, if any
+    const targetIds = new Set();
+    if (shift.assignedWorker) {
+      targetIds.add(shift.assignedWorker.toString());
+    }
+    shift.applications.forEach((a) => targetIds.add(a.worker.toString()));
+
+    if (targetIds.size > 0) {
+      await Notification.insertMany(
+        Array.from(targetIds).map((id) => ({
+          userId: id,
+          message: `Shift "${shift.title}" was cancelled by the employer`,
+          type: 'shift_cancelled',
+          relatedId: shift._id
+        }))
+      );
+    }
+
+    await ActivityFeed.create({
+      user: req.user.id,
+      action: `cancelled shift: ${shift.title}`,
+      type: 'shift_assignment',
+      relatedId: shift._id
+    });
+
+    return res.json({ message: 'Shift cancelled', shift });
+  } catch (err) {
+    console.error('Cancel shift error', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

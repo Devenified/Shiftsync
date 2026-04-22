@@ -4,21 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main"
+    android:background="@drawable/bg_screen_gradient"
     tools:context=".EditProfileActivity">
 
     <!-- App Bar -->
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/brand_orange"
+        android:background="@drawable/bg_hero_gradient"
         app:elevation="0dp">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:background="@color/brand_orange"
+            android:background="@drawable/bg_hero_gradient"
             app:menu="@menu/menu_toolbar_sign_out"
             app:navigationIcon="?attr/homeAsUpIndicator"
             app:navigationIconTint="#FFFFFF"
@@ -46,9 +46,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                app:cardBackgroundColor="@color/brand_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="@dimen/card_elevation">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -62,13 +62,13 @@
                         android:layout_height="100dp"
                         app:cardCornerRadius="50dp"
                         app:cardElevation="4dp"
-                        app:cardBackgroundColor="@color/brand_orange">
+                        app:cardBackgroundColor="@color/brand_primary">
 
                         <ImageView
                             android:id="@+id/profile_photo"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:src="@android:drawable/ic_menu_myplaces"
+                            android:src="@drawable/ic_person_modern"
                             android:padding="25dp"
                             app:tint="@color/brand_white"
                             android:scaleType="centerCrop" />
@@ -80,7 +80,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Change Photo"
-                        android:textColor="@color/brand_orange"
+                        android:textColor="@color/brand_primary"
                         android:textSize="14sp"
                         android:textStyle="bold"
                         android:layout_marginTop="12dp"
@@ -97,9 +97,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                app:cardBackgroundColor="@color/brand_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="@dimen/card_elevation">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -117,14 +117,12 @@
                         android:layout_marginBottom="16dp" />
 
                     <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        style="@style/Widget.ShiftSync.TextInputLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="12dp"
-                        app:boxStrokeColor="@color/brand_orange"
-                        app:hintTextColor="@color/text_medium"
-                        app:prefixTextColor="@color/text_medium"
-                        android:textColorHint="@color/text_medium">
+                        android:hint="Full Name"
+                        app:startIconDrawable="@drawable/ic_person_modern">
 
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/full_name_input"
@@ -132,8 +130,7 @@
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName"
                             android:textColor="@color/text_primary"
-                            android:textColorHint="@color/text_medium"
-                            android:hint="Full Name" />
+                            android:textColorHint="@color/text_muted" />
 
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -144,14 +141,13 @@
                         android:layout_marginBottom="12dp">
 
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            style="@style/Widget.ShiftSync.TextInputLayout"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginEnd="8dp"
-                            app:boxStrokeColor="@color/brand_orange"
-                            app:hintTextColor="@color/text_medium"
-                            android:textColorHint="@color/text_medium">
+                            android:hint="Phone"
+                            app:startIconDrawable="@drawable/ic_phone_modern">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/phone_input"
@@ -159,20 +155,18 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="phone"
                                 android:textColor="@color/text_primary"
-                                android:textColorHint="@color/text_medium"
-                                android:hint="Phone" />
+                            android:textColorHint="@color/text_muted" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                            style="@style/Widget.ShiftSync.TextInputLayout"
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:layout_marginStart="8dp"
-                            app:boxStrokeColor="@color/brand_orange"
-                            app:hintTextColor="@color/text_medium"
-                            android:textColorHint="@color/text_medium">
+                            android:hint="DOB (DD/MM/YYYY)"
+                            app:startIconDrawable="@drawable/ic_calendar_modern">
 
                             <com.google.android.material.textfield.TextInputEditText
                                 android:id="@+id/dob_input"
@@ -180,8 +174,7 @@
                                 android:layout_height="wrap_content"
                                 android:inputType="date"
                                 android:textColor="@color/text_primary"
-                                android:textColorHint="@color/text_medium"
-                                android:hint="DOB (DD/MM/YYYY)" />
+                            android:textColorHint="@color/text_muted" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -214,7 +207,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Male"
                                 android:textColor="@color/text_medium"
-                                android:buttonTint="@color/brand_orange"
+                                android:buttonTint="@color/brand_primary"
                                 android:layout_marginEnd="16dp" />
 
                             <RadioButton
@@ -223,7 +216,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Female"
                                 android:textColor="@color/text_medium"
-                                android:buttonTint="@color/brand_orange"
+                                android:buttonTint="@color/brand_primary"
                                 android:layout_marginEnd="16dp" />
 
                             <RadioButton
@@ -232,7 +225,7 @@
                                 android:layout_height="wrap_content"
                                 android:text="Other"
                                 android:textColor="@color/text_medium"
-                                android:buttonTint="@color/brand_orange" />
+                                android:buttonTint="@color/brand_primary" />
 
                         </RadioGroup>
 
@@ -247,9 +240,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
-                app:cardBackgroundColor="@color/brand_surface"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
+                app:cardBackgroundColor="@color/bg_card"
+                app:cardCornerRadius="@dimen/card_corner_radius_large"
+                app:cardElevation="@dimen/card_elevation">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -522,12 +515,12 @@
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/add_skill_button"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Add"
-                            android:textColor="@color/text_primary"
-                            app:backgroundTint="@color/brand_orange"
-                            app:cornerRadius="8dp" />
+                        style="@style/Widget.ShiftSync.Button.Primary"
+                        android:layout_width="wrap_content"
+                        android:layout_height="@dimen/touch_target_min"
+                        android:text="Add"
+                        app:icon="@drawable/ic_plus_modern"
+                        app:iconTint="#FFFFFF" />
 
                     </LinearLayout>
 
@@ -555,7 +548,7 @@
                         android:textColor="@color/text_primary"
                         app:backgroundTint="@color/brand_surface"
                         app:cornerRadius="8dp"
-                        app:strokeColor="@color/brand_orange"
+                    app:strokeColor="@color/brand_primary"
                         app:strokeWidth="1dp"
                         android:layout_marginBottom="12dp" />
 

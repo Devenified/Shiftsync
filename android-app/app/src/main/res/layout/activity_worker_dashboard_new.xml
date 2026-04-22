@@ -1,435 +1,578 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main">
+    android:background="@drawable/bg_screen_gradient">
 
-    <!-- Header -->
-    <LinearLayout
-        android:id="@+id/header_section"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="20dp"
-        android:gravity="center_vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/profile_icon"
-            android:layout_width="64dp"
-            android:layout_height="64dp"
-            android:background="@drawable/circle_background"
-            android:padding="14dp"
-            android:src="@android:drawable/ic_menu_myplaces"
-            app:tint="#FFFFFF"
-            android:contentDescription="Profile" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="16dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/welcome_greeting"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/greeting_hindi"
-                android:textColor="@color/text_medium"
-                android:textSize="@dimen/text_body"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/worker_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Worker Name"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_title"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/worker_status"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/available_for_work"
-                android:textColor="@color/status_available"
-                android:textSize="@dimen/text_caption" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/header_sign_out"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/touch_target_min"
-            android:gravity="center"
-            android:paddingHorizontal="12dp"
-            android:text="@string/action_logout"
-            android:textColor="@color/brand_orange"
-            android:textSize="@dimen/text_caption"
-            android:textStyle="bold" />
-
-        <ImageView
-            android:id="@+id/notification_icon"
-            android:layout_width="@dimen/touch_target_min"
-            android:layout_height="@dimen/touch_target_min"
-            android:background="@drawable/circle_background"
-            android:padding="10dp"
-            android:src="@android:drawable/ic_dialog_email"
-            app:tint="@color/brand_orange"
-            android:contentDescription="Notifications" />
-    </LinearLayout>
-
-    <!-- Scrollable content -->
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
         android:fillViewport="true"
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
-        app:layout_constraintTop_toBottomOf="@id/header_section">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="20dp">
+            android:paddingBottom="24dp">
 
-            <!-- Earnings Card -->
-            <androidx.cardview.widget.CardView
+            <LinearLayout
+                android:id="@+id/header_section"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/brand_orange"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="8dp">
+                android:background="@drawable/bg_hero_indigo"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingTop="28dp"
+                android:paddingBottom="92dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/card_inner_padding">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/todays_earnings"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_subtitle"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/today_earnings"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:text="₹ 0"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_money_large"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/monthly_earnings"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="This month: ₹ 0"
-                        android:textColor="@color/text_primary"
-                        android:textSize="@dimen/text_body" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
-
-            <!-- Quick Actions heading -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/quick_actions"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_title"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Quick Action Grid -->
-            <GridLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:columnCount="2"
-                android:rowCount="2"
-                android:layout_marginBottom="24dp">
-
-                <!-- Find Work -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/find_work_card"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/quick_action_card_height"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardBackgroundColor="@color/brand_surface"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="@dimen/card_elevation">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground">
+                    <FrameLayout
+                        android:id="@+id/profile_icon"
+                        android:layout_width="@dimen/avatar_medium"
+                        android:layout_height="@dimen/avatar_medium"
+                        android:background="@drawable/bg_pill_glass">
 
                         <ImageView
-                            android:layout_width="@dimen/icon_large"
-                            android:layout_height="@dimen/icon_large"
-                            android:src="@android:drawable/ic_search_category_default"
-                            app:tint="@color/brand_orange"
-                            android:contentDescription="Find Work" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="@string/find_work_emoji"
-                            android:textColor="@color/text_primary"
-                            android:textSize="@dimen/text_body"
-                            android:textStyle="bold"
-                            android:gravity="center" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- My Shifts -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/my_shifts_card"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/quick_action_card_height"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginBottom="12dp"
-                    app:cardBackgroundColor="@color/brand_surface"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="@dimen/card_elevation">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="@dimen/icon_large"
-                            android:layout_height="@dimen/icon_large"
-                            android:src="@android:drawable/ic_menu_agenda"
-                            app:tint="@color/status_available"
-                            android:contentDescription="My Shifts" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="@string/my_shifts_emoji"
-                            android:textColor="@color/text_primary"
-                            android:textSize="@dimen/text_body"
-                            android:textStyle="bold"
-                            android:gravity="center" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Profile -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/profile_card"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/quick_action_card_height"
-                    android:layout_columnWeight="1"
-                    android:layout_marginEnd="8dp"
-                    android:layout_marginTop="4dp"
-                    app:cardBackgroundColor="@color/brand_surface"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="@dimen/card_elevation">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="@dimen/icon_large"
-                            android:layout_height="@dimen/icon_large"
-                            android:src="@android:drawable/ic_menu_myplaces"
-                            app:tint="@color/brand_orange"
-                            android:contentDescription="Profile" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="@string/my_profile_emoji"
-                            android:textColor="@color/text_primary"
-                            android:textSize="@dimen/text_body"
-                            android:textStyle="bold"
-                            android:gravity="center" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-
-                <!-- Help -->
-                <androidx.cardview.widget.CardView
-                    android:id="@+id/help_card"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/quick_action_card_height"
-                    android:layout_columnWeight="1"
-                    android:layout_marginStart="8dp"
-                    android:layout_marginTop="4dp"
-                    app:cardBackgroundColor="@color/brand_surface"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    app:cardElevation="@dimen/card_elevation">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:padding="16dp"
-                        android:clickable="true"
-                        android:focusable="true"
-                        android:background="?android:attr/selectableItemBackground">
-
-                        <ImageView
-                            android:layout_width="@dimen/icon_large"
-                            android:layout_height="@dimen/icon_large"
-                            android:src="@android:drawable/ic_menu_help"
-                            app:tint="@color/text_medium"
-                            android:contentDescription="Help" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="12dp"
-                            android:text="@string/help_emoji"
-                            android:textColor="@color/text_primary"
-                            android:textSize="@dimen/text_body"
-                            android:textStyle="bold"
-                            android:gravity="center" />
-                    </LinearLayout>
-                </androidx.cardview.widget.CardView>
-            </GridLayout>
-
-            <!-- Availability Toggle -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardBackgroundColor="@color/brand_surface"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="@dimen/card_inner_padding"
-                    android:gravity="center_vertical">
-
-                    <ImageView
-                        android:layout_width="@dimen/icon_medium"
-                        android:layout_height="@dimen/icon_medium"
-                        android:src="@android:drawable/presence_online"
-                        app:tint="@color/status_available"
-                        android:contentDescription="Status" />
+                            android:layout_width="28dp"
+                            android:layout_height="28dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="Profile"
+                            android:src="@drawable/ic_person_modern"
+                            app:tint="@android:color/white" />
+                    </FrameLayout>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="14dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="16dp"
                         android:orientation="vertical">
 
                         <TextView
+                            android:id="@+id/welcome_greeting"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/work_status"
-                            android:textColor="@color/text_primary"
-                            android:textSize="@dimen/text_subtitle"
-                            android:textStyle="bold" />
+                            android:alpha="0.85"
+                            android:text="@string/greeting_hindi"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_caption" />
 
                         <TextView
-                            android:id="@+id/availability_text"
+                            android:id="@+id/worker_name"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/available_today"
-                            android:textColor="@color/text_medium"
-                            android:textSize="@dimen/text_body" />
+                            android:text="Worker"
+                            android:textColor="@android:color/white"
+                            android:textSize="@dimen/text_title"
+                            android:textStyle="bold" />
                     </LinearLayout>
 
-                    <Switch
-                        android:id="@+id/availability_switch"
+                    <FrameLayout
+                        android:id="@+id/notification_icon"
+                        android:layout_width="@dimen/touch_target_min"
+                        android:layout_height="@dimen/touch_target_min"
+                        android:background="@drawable/bg_pill_glass"
+                        android:clickable="true"
+                        android:contentDescription="Notifications"
+                        android:focusable="true">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:src="@drawable/ic_bell_modern"
+                            app:tint="@android:color/white" />
+
+                        <View
+                            android:layout_width="10dp"
+                            android:layout_height="10dp"
+                            android:layout_gravity="top|end"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginEnd="10dp"
+                            android:background="@drawable/bg_notification_dot" />
+                    </FrameLayout>
+
+                    <TextView
+                        android:id="@+id/header_sign_out"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="16dp"
-                        android:minHeight="@dimen/touch_target_min" />
+                        android:layout_height="@dimen/touch_target_min"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_status_dark"
+                        android:gravity="center"
+                        android:paddingHorizontal="12dp"
+                        android:text="@string/action_logout"
+                        android:textColor="@android:color/white"
+                        android:textSize="@dimen/text_caption"
+                        android:textStyle="bold" />
                 </LinearLayout>
-            </androidx.cardview.widget.CardView>
 
-            <!-- Recent Activity heading -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/recent_activity"
-                android:textColor="@color/text_primary"
-                android:textSize="@dimen/text_title"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="22dp"
+                    android:text="@string/worker_dashboard_overview"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_headline"
+                    android:textStyle="bold" />
 
-            <!-- Recent Activity Card -->
-            <androidx.cardview.widget.CardView
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:alpha="0.9"
+                    android:text="@string/worker_dashboard_subtitle"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_body" />
+
+                <TextView
+                    android:id="@+id/worker_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_status_dark"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="7dp"
+                    android:text="@string/available_for_work"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/text_caption"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardBackgroundColor="@color/brand_surface"
-                app:cardCornerRadius="@dimen/card_corner_radius"
-                app:cardElevation="@dimen/card_elevation">
+                android:layout_marginTop="-64dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="@dimen/card_inner_padding">
+                    android:layout_marginBottom="16dp"
+                    android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/recent_activity_text"
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_card_sunrise"
+                            android:orientation="vertical"
+                            android:padding="18dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.85"
+                                android:text="@string/worker_stat_total"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_caption" />
+
+                            <TextView
+                                android:id="@+id/today_earnings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="&#8377;0"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_money_medium"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1"
+                        app:cardBackgroundColor="@android:color/transparent"
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/bg_card_indigo"
+                            android:orientation="vertical"
+                            android:padding="18dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.85"
+                                android:text="@string/worker_stat_month"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_caption" />
+
+                            <TextView
+                                android:id="@+id/monthly_earnings"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="This month: &#8377;0"
+                                android:textColor="@android:color/white"
+                                android:textSize="@dimen/text_body_large"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/quick_actions"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_title"
+                    android:textStyle="bold" />
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:columnCount="2"
+                    android:rowCount="2">
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/find_work_card"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/quick_action_card_height"
+                        android:layout_columnWeight="1"
+                        android:layout_marginEnd="6dp"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="@color/bg_card"
+                        app:cardCornerRadius="@dimen/card_corner_radius_large"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_surface_panel_soft"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <FrameLayout
+                                android:layout_width="@dimen/icon_card_action"
+                                android:layout_height="@dimen/icon_card_action"
+                                android:background="@drawable/bg_icon_container_primary">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_search_modern"
+                                    app:tint="@color/brand_primary" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="Find Work"
+                                android:textColor="@color/text_primary"
+                                android:textSize="@dimen/text_body"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.75"
+                                android:text="Browse live openings"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_caption" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/my_shifts_card"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/quick_action_card_height"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginBottom="12dp"
+                        app:cardBackgroundColor="@color/bg_card"
+                        app:cardCornerRadius="@dimen/card_corner_radius_large"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_surface_panel_soft"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <FrameLayout
+                                android:layout_width="@dimen/icon_card_action"
+                                android:layout_height="@dimen/icon_card_action"
+                                android:background="@drawable/bg_icon_container_emerald">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_calendar_modern"
+                                    app:tint="@color/status_success" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="My Shifts"
+                                android:textColor="@color/text_primary"
+                                android:textSize="@dimen/text_body"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.75"
+                                android:text="Assigned and applied"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_caption" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/profile_card"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/quick_action_card_height"
+                        android:layout_columnWeight="1"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="6dp"
+                        app:cardBackgroundColor="@color/bg_card"
+                        app:cardCornerRadius="@dimen/card_corner_radius_large"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_surface_panel_soft"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <FrameLayout
+                                android:layout_width="@dimen/icon_card_action"
+                                android:layout_height="@dimen/icon_card_action"
+                                android:background="@drawable/bg_icon_container_indigo">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_person_modern"
+                                    app:tint="@color/brand_secondary" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="Profile"
+                                android:textColor="@color/text_primary"
+                                android:textSize="@dimen/text_body"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.75"
+                                android:text="Skills and preferences"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_caption" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/help_card"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/quick_action_card_height"
+                        android:layout_columnWeight="1"
+                        android:layout_marginStart="6dp"
+                        android:layout_marginTop="4dp"
+                        app:cardBackgroundColor="@color/bg_card"
+                        app:cardCornerRadius="@dimen/card_corner_radius_large"
+                        app:cardElevation="0dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/bg_surface_panel_soft"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="14dp">
+
+                            <FrameLayout
+                                android:layout_width="@dimen/icon_card_action"
+                                android:layout_height="@dimen/icon_card_action"
+                                android:background="@drawable/bg_icon_container_violet">
+
+                                <ImageView
+                                    android:layout_width="22dp"
+                                    android:layout_height="22dp"
+                                    android:layout_gravity="center"
+                                    android:src="@drawable/ic_sparkles_modern"
+                                    app:tint="@color/shift_night" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="10dp"
+                                android:text="AI Advisor"
+                                android:textColor="@color/text_primary"
+                                android:textSize="@dimen/text_body"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:alpha="0.75"
+                                android:text="Suggestions and guidance"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_caption" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </GridLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="@dimen/card_corner_radius_large"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/no_recent_activity"
-                        android:textColor="@color/text_medium"
-                        android:textSize="@dimen/text_body"
-                        android:gravity="center"
-                        android:padding="16dp" />
-                </LinearLayout>
-            </androidx.cardview.widget.CardView>
+                        android:background="@drawable/bg_surface_panel"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/card_inner_padding">
 
+                        <FrameLayout
+                            android:layout_width="@dimen/icon_card_action"
+                            android:layout_height="@dimen/icon_card_action"
+                            android:background="@drawable/bg_icon_container_emerald">
+
+                            <ImageView
+                                android:layout_width="22dp"
+                                android:layout_height="22dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_clock_modern"
+                                app:tint="@color/status_success" />
+                        </FrameLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="14dp"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/worker_stat_status"
+                                android:textColor="@color/text_primary"
+                                android:textSize="@dimen/text_subtitle"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:id="@+id/availability_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/available_today"
+                                android:textColor="@color/text_secondary"
+                                android:textSize="@dimen/text_body" />
+                        </LinearLayout>
+
+                        <Switch
+                            android:id="@+id/availability_switch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="12dp"
+                            android:minHeight="@dimen/touch_target_min"
+                            android:thumbTint="@color/brand_primary" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:text="@string/recent_activity"
+                    android:textColor="@color/text_primary"
+                    android:textSize="@dimen/text_title"
+                    android:textStyle="bold" />
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="@dimen/card_corner_radius_large"
+                    app:cardElevation="0dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_surface_panel"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_inner_padding">
+
+                        <TextView
+                            android:id="@+id/recent_activity_text"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:padding="16dp"
+                            android:text="@string/no_recent_activity"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="@dimen/text_body" />
+                    </LinearLayout>
+                </androidx.cardview.widget.CardView>
+            </LinearLayout>
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
-    <!-- Bottom Navigation — big icons, large labels -->
     <LinearLayout
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/bg_bottom_nav_floating"
+        android:elevation="0dp"
         android:orientation="horizontal"
-        android:background="@color/brand_surface"
-        android:paddingVertical="10dp"
         android:paddingHorizontal="8dp"
-        android:elevation="8dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="18dp"
         app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
@@ -437,29 +580,29 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:minHeight="@dimen/touch_target_min"
-            android:padding="6dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:orientation="vertical"
+            android:padding="6dp">
 
             <ImageView
                 android:layout_width="@dimen/icon_nav"
                 android:layout_height="@dimen/icon_nav"
-                android:src="@android:drawable/ic_menu_today"
-                app:tint="@color/brand_orange"
-                android:contentDescription="Home" />
+                android:contentDescription="Home"
+                android:src="@drawable/ic_home_modern"
+                app:tint="@color/nav_selected" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/nav_worker_home"
-                android:textColor="@color/brand_orange"
+                android:textColor="@color/nav_selected"
                 android:textSize="@dimen/text_nav_label"
-                android:textStyle="bold"
-                android:layout_marginTop="4dp" />
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -467,28 +610,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:minHeight="@dimen/touch_target_min"
-            android:padding="6dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:orientation="vertical"
+            android:padding="6dp">
 
             <ImageView
                 android:layout_width="@dimen/icon_nav"
                 android:layout_height="@dimen/icon_nav"
-                android:src="@android:drawable/ic_search_category_default"
-                app:tint="@color/text_medium"
-                android:contentDescription="Find Work" />
+                android:contentDescription="Find Work"
+                android:src="@drawable/ic_search_modern"
+                app:tint="@color/nav_unselected" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Find Work"
-                android:textColor="@color/text_medium"
-                android:textSize="@dimen/text_nav_label"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="4dp"
+                android:text="Find"
+                android:textColor="@color/nav_unselected"
+                android:textSize="@dimen/text_nav_label" />
         </LinearLayout>
 
         <LinearLayout
@@ -496,28 +639,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:minHeight="@dimen/touch_target_min"
-            android:padding="6dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:orientation="vertical"
+            android:padding="6dp">
 
             <ImageView
                 android:layout_width="@dimen/icon_nav"
                 android:layout_height="@dimen/icon_nav"
-                android:src="@android:drawable/ic_menu_agenda"
-                app:tint="@color/text_medium"
-                android:contentDescription="My Shifts" />
+                android:contentDescription="My Shifts"
+                android:src="@drawable/ic_calendar_modern"
+                app:tint="@color/nav_unselected" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/nav_worker_shifts"
-                android:textColor="@color/text_medium"
-                android:textSize="@dimen/text_nav_label"
-                android:layout_marginTop="4dp" />
+                android:textColor="@color/nav_unselected"
+                android:textSize="@dimen/text_nav_label" />
         </LinearLayout>
 
         <LinearLayout
@@ -525,28 +668,28 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center"
+            android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
+            android:gravity="center"
             android:minHeight="@dimen/touch_target_min"
-            android:padding="6dp"
-            android:background="?android:attr/selectableItemBackground">
+            android:orientation="vertical"
+            android:padding="6dp">
 
             <ImageView
                 android:layout_width="@dimen/icon_nav"
                 android:layout_height="@dimen/icon_nav"
-                android:src="@android:drawable/ic_menu_myplaces"
-                app:tint="@color/text_medium"
-                android:contentDescription="Profile" />
+                android:contentDescription="Profile"
+                android:src="@drawable/ic_person_modern"
+                app:tint="@color/nav_unselected" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/nav_worker_profile"
-                android:textColor="@color/text_medium"
-                android:textSize="@dimen/text_nav_label"
-                android:layout_marginTop="4dp" />
+                android:textColor="@color/nav_unselected"
+                android:textSize="@dimen/text_nav_label" />
         </LinearLayout>
     </LinearLayout>
 

@@ -127,14 +127,14 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
 
     private void addWelcomeMessage() {
         AIMessage welcome = new AIMessage(
-            "Hello! 👋 I'm your AI Skill Advisor. I can help you:\n\n" +
-            "• Assess your current skills\n" +
-            "• Recommend skills to develop\n" +
-            "• Suggest better-paying job opportunities\n" +
-            "• Guide your career growth on ShiftSync\n\n" +
-            "What would you like to know?",
-            AIMessage.MessageType.BOT,
-            "Welcome"
+                "Tell me your skills + location + experience and I’ll recommend the best work for you.\n\n" +
+                        "Examples:\n" +
+                        "• “Packing + basic Excel, Pune, 1 year”\n" +
+                        "• “Cashier + customer support, Bangalore, 0 exp”\n" +
+                        "• “Cleaning + housekeeping, Delhi, 2 years”\n\n" +
+                        "Or tap “Job ideas” for quick recommendations.",
+                AIMessage.MessageType.BOT,
+                "Welcome"
         );
         messages.add(welcome);
         messageAdapter.notifyItemInserted(messages.size() - 1);
@@ -170,7 +170,17 @@ public class AISkillAdvisorActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 JSONObject payload = new JSONObject();
-                payload.put("question", question);
+                payload.put(
+                        "question",
+                        "You are a career + shift advisor for ShiftSync. Give practical, India-friendly advice.\n" +
+                                "Output format:\n" +
+                                "1) Best-fit work (top 3)\n" +
+                                "2) Why it fits (1 line each)\n" +
+                                "3) What to do next (3 bullets)\n" +
+                                "4) Skill upgrade (2 quick skills)\n\n" +
+                                "User question:\n" +
+                                question
+                );
 
                 ApiClient.HttpResult res = ApiClient.post(
                     "/api/ai/ask-skill-advisor",

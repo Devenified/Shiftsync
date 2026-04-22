@@ -82,6 +82,12 @@ const loginBase = async (req, res, expectedRole = null) => {
       });
     }
 
+    // Update login tracking (fire-and-forget)
+    User.findByIdAndUpdate(user._id, {
+      $inc: { loginCount: 1 },
+      lastLogin: new Date()
+    }).catch(() => {});
+
     const token = generateToken(user);
 
     return res.json({
@@ -225,7 +231,7 @@ exports.updateProfile = async (req, res) => {
     }
 
     const user = await User.findByIdAndUpdate(req.user.id, updates, {
-      new: true,
+      returnDocument: 'after',
       runValidators: true
     }).select(
       '_id fullName email phoneNumber companyName role hasProfile profilePhoto dateOfBirth gender address location skills skillLevel experienceYears previousWork education bio languages certifications preferredWorkTypes preferredLocations expectedWage wageNegotiable workFlexibility isAvailable availableFrom availableTo preferredWorkHours isVerified verificationDocuments emergencyContact rating totalReviews completedShifts totalEarnings averageResponseTime onTimeCompletionRate notifications isActive lastLogin loginCount'
@@ -373,6 +379,11 @@ exports.getEmployerDashboard = async (req, res) => {
       );
     });
 
+    const upcomingShift = await Shift.findOne({
+      employer: req.user.id,
+      status: { $in: ['open', 'assigned'] }
+    }).sort({ shiftDate: 1, startTime: 1 });
+
     return res.json({
       message: 'Employer dashboard data fetched successfully',
       dashboard: 'employer',
@@ -380,12 +391,22 @@ exports.getEmployerDashboard = async (req, res) => {
         userId: employer._id,
         fullName: employer.fullName,
         role: employer.role,
+        activeShifts: openShifts + assignedShifts,
         totalShifts,
         openShifts,
         assignedShifts,
         completedShifts,
         totalApplications,
-        totalWorkersEngaged: uniqueWorkerIds.size
+        totalWorkersEngaged: uniqueWorkerIds.size,
+        nextShift: upcomingShift
+          ? {
+              id: upcomingShift._id,
+              title: upcomingShift.title,
+              shiftDate: upcomingShift.shiftDate,
+              startTime: upcomingShift.startTime,
+              endTime: upcomingShift.endTime
+            }
+          : null
       }
     });
   } catch (err) {
@@ -451,6 +472,61 @@ exports.searchWorkers = async (req, res) => {
     });
   } catch (err) {
     console.error('Worker search error', err);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// GET /api/users/:id (protected, employer only)
+// Allows employers to view a worker profile for hiring decisions.
+exports.getUserByIdForEmployer = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select(
+      '_id fullName email phoneNumber role profilePhoto location skills skillLevel experienceYears previousWork education bio languages certifications preferredWorkTypes preferredLocations expectedWage wageNegotiable workFlexibility isAvailable preferredWorkHours isVerified rating totalReviews completedShifts totalEarnings averageResponseTime onTimeCompletionRate lastLogin'
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (user.role !== 'worker') {
+      return res.status(403).json({ message: 'Only worker profiles are viewable' });
+    }
+
+    return res.json({
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+        profilePhoto: user.profilePhoto,
+        location: user.location,
+        skills: user.skills,
+        skillLevel: user.skillLevel,
+        experienceYears: user.experienceYears,
+        previousWork: user.previousWork,
+        education: user.education,
+        bio: user.bio,
+        languages: user.languages,
+        certifications: user.certifications,
+        preferredWorkTypes: user.preferredWorkTypes,
+        preferredLocations: user.preferredLocations,
+        expectedWage: user.expectedWage,
+        wageNegotiable: user.wageNegotiable,
+        workFlexibility: user.workFlexibility,
+        isAvailable: user.isAvailable,
+        preferredWorkHours: user.preferredWorkHours,
+        isVerified: user.isVerified,
+        rating: user.rating,
+        totalReviews: user.totalReviews,
+        completedShifts: user.completedShifts,
+        totalEarnings: user.totalEarnings,
+        averageResponseTime: user.averageResponseTime,
+        onTimeCompletionRate: user.onTimeCompletionRate,
+        lastLogin: user.lastLogin
+      }
+    });
+  } catch (err) {
+    console.error('Get user by id (employer) error', err);
     return res.status(500).json({ message: 'Internal server error' });
   }
 };

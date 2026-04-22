@@ -190,7 +190,7 @@
                 android:contentDescription="Send question"
                 android:padding="14dp"
                 android:scaleType="centerInside"
-                android:src="@android:drawable/ic_menu_send"
+        android:src="@drawable/ic_chat_modern"
                 android:tint="@color/white" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

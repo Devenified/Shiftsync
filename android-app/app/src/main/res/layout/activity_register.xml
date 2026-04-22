@@ -5,22 +5,20 @@
     android:id="@+id/register_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bg_main">
+    android:background="@drawable/bg_screen_gradient">
 
     <!-- Big Back Button -->
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_back"
-        style="@style/Widget.MaterialComponents.Button.TextButton"
+        style="@style/Widget.ShiftSync.Button.Ghost"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/touch_target_min"
         android:layout_margin="16dp"
-        android:text="BACK"
-        android:textColor="@color/brand_orange"
-        android:textSize="@dimen/text_button"
-        android:textStyle="bold"
-        app:icon="@android:drawable/ic_menu_revert"
-        app:iconSize="32dp"
-        app:iconTint="@color/brand_orange"
+        android:text="Back"
+        android:textColor="@color/brand_primary"
+        app:icon="@drawable/ic_arrow_back_round"
+        app:iconSize="22dp"
+        app:iconTint="@color/brand_primary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -37,24 +35,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="S"
-            android:textColor="@color/white"
-            android:background="@drawable/logo_bg"
-            android:textSize="44sp"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="8dp"
-            android:textStyle="bold" />
+            android:layout_marginTop="8dp"
+            android:text="@string/register_headline"
+            android:textAppearance="@style/TextAppearance.ShiftSync.Title"
+            android:gravity="center" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="JOIN SHIFTSYNC"
-            android:textColor="@color/white"
-            android:textSize="@dimen/text_title"
-            android:letterSpacing="0.15"
-            android:fontFamily="sans-serif-black"
-            android:textStyle="bold" />
+            android:layout_marginTop="6dp"
+            android:layout_marginHorizontal="28dp"
+            android:gravity="center"
+            android:text="@string/register_subtitle"
+            android:textAppearance="@style/TextAppearance.ShiftSync.Body" />
     </LinearLayout>
 
     <!-- Form -->
@@ -71,9 +64,9 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="40dp"
-            app:cardBackgroundColor="@color/brand_surface"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="12dp">
+            app:cardBackgroundColor="@color/bg_card"
+            app:cardCornerRadius="@dimen/card_corner_radius_large"
+            app:cardElevation="@dimen/card_elevation_raised">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,156 +81,105 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="24dp"
                     android:background="@android:color/transparent"
-                    app:tabIndicatorColor="@color/brand_orange"
-                    app:tabSelectedTextColor="@color/brand_orange"
+                    app:tabIndicatorColor="@color/brand_primary"
+                    app:tabSelectedTextColor="@color/brand_primary"
                     app:tabTextColor="@color/text_medium"
                     app:tabIndicatorHeight="4dp"
                     app:tabIndicatorFullWidth="false"
-                    app:tabTextAppearance="@style/TextAppearance.ShiftSync.Toolbar" />
+                    app:tabTextAppearance="@style/TextAppearance.ShiftSync.Subtitle" />
 
                 <!-- Full Name -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/name_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.ShiftSync.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="FULL NAME"
-                    android:textColorHint="#E0E0E0"
-                    app:boxBackgroundColor="#2A2A2A"
-                    app:boxCornerRadiusBottomEnd="14dp"
-                    app:boxCornerRadiusBottomStart="14dp"
-                    app:boxCornerRadiusTopEnd="14dp"
-                    app:boxCornerRadiusTopStart="14dp"
-                    app:boxStrokeColor="@color/brand_orange"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="@color/brand_orange"
-                    app:startIconDrawable="@android:drawable/ic_menu_edit"
-                    app:startIconTint="@color/brand_orange">
+                    android:hint="Full name"
+                    app:startIconDrawable="@drawable/ic_person_modern">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/name_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPersonName"
                         android:padding="18dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_body" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Email -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/reg_email_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.ShiftSync.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="EMAIL"
-                    android:textColorHint="#E0E0E0"
-                    app:boxBackgroundColor="#2A2A2A"
-                    app:boxCornerRadiusBottomEnd="14dp"
-                    app:boxCornerRadiusBottomStart="14dp"
-                    app:boxCornerRadiusTopEnd="14dp"
-                    app:boxCornerRadiusTopStart="14dp"
-                    app:boxStrokeColor="@color/brand_orange"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="@color/brand_orange"
-                    app:startIconDrawable="@android:drawable/ic_dialog_email"
-                    app:startIconTint="@color/brand_orange">
+                    android:hint="Email"
+                    app:startIconDrawable="@drawable/ic_email_modern">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/reg_email_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textEmailAddress"
                         android:padding="18dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_body" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Phone -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/phone_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.ShiftSync.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="PHONE"
-                    android:textColorHint="#E0E0E0"
-                    app:boxBackgroundColor="#2A2A2A"
-                    app:boxCornerRadiusBottomEnd="14dp"
-                    app:boxCornerRadiusBottomStart="14dp"
-                    app:boxCornerRadiusTopEnd="14dp"
-                    app:boxCornerRadiusTopStart="14dp"
-                    app:boxStrokeColor="@color/brand_orange"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="@color/brand_orange"
-                    app:startIconDrawable="@android:drawable/stat_sys_phone_call"
-                    app:startIconTint="@color/brand_orange">
+                    android:hint="Phone"
+                    app:startIconDrawable="@drawable/ic_phone_modern">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/phone_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="phone"
                         android:padding="18dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_body" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Company -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/company_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.ShiftSync.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="COMPANY"
-                    android:textColorHint="#E0E0E0"
-                    app:boxBackgroundColor="#2A2A2A"
-                    app:boxCornerRadiusBottomEnd="14dp"
-                    app:boxCornerRadiusBottomStart="14dp"
-                    app:boxCornerRadiusTopEnd="14dp"
-                    app:boxCornerRadiusTopStart="14dp"
-                    app:boxStrokeColor="@color/brand_orange"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="@color/brand_orange"
-                    app:startIconDrawable="@android:drawable/ic_menu_myplaces"
-                    app:startIconTint="@color/brand_orange">
+                    android:hint="Company (optional)"
+                    app:startIconDrawable="@drawable/ic_briefcase_modern">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/company_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="text"
                         android:padding="18dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_body" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Password -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/reg_password_layout"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    style="@style/Widget.ShiftSync.TextInputLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="PASSWORD"
-                    android:textColorHint="#E0E0E0"
-                    app:boxBackgroundColor="#2A2A2A"
-                    app:boxCornerRadiusBottomEnd="14dp"
-                    app:boxCornerRadiusBottomStart="14dp"
-                    app:boxCornerRadiusTopEnd="14dp"
-                    app:boxCornerRadiusTopStart="14dp"
-                    app:boxStrokeColor="@color/brand_orange"
-                    app:boxStrokeWidth="2dp"
-                    app:hintTextColor="@color/brand_orange"
-                    app:passwordToggleEnabled="true"
-                    app:passwordToggleTint="#BDBDBD"
-                    app:startIconDrawable="@android:drawable/ic_lock_idle_lock"
-                    app:startIconTint="@color/brand_orange">
+                    android:hint="Password"
+                    app:endIconMode="password_toggle"
+                    app:startIconDrawable="@drawable/ic_lock_modern">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/reg_password_edit_text"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textPassword"
                         android:padding="18dp"
-                        android:textColor="@color/white"
+                        android:textColor="@color/text_primary"
                         android:textSize="@dimen/text_body" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -248,9 +190,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/button_height_large"
                     android:layout_marginTop="28dp"
-                    android:text="CREATE PROFILE"
+                    android:text="Create account"
                     android:textSize="@dimen/text_button"
-                    android:letterSpacing="0.05" />
+                    app:icon="@drawable/ic_check_modern"
+                    app:iconTint="#FFFFFF" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>

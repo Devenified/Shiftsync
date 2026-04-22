@@ -14,22 +14,19 @@ import java.nio.charset.StandardCharsets;
  */
 public final class ApiClient {
 
-    // Try different IP addresses until one works (emulator prioritized)
     private static final String[] POSSIBLE_IPS = {
-        "http://10.0.2.2:3000",      // Android emulator (first priority for emulator)
-        "http://localhost:3000",      // Localhost fallback
-        "http://10.87.0.168:3000",  // Your Wi-Fi IP (for USB debugging)
-        "http://192.168.1.100:3000", // Common home network
-        "http://192.168.0.100:3000"  // Alternative home network
+        BuildConfig.BACKEND_BASE_URL,
+        "http://10.0.2.2:3000",
+        "http://localhost:3000"
     };
     
-    public static String BASE_URL = POSSIBLE_IPS[0]; // Default to first IP
+    public static String BASE_URL = POSSIBLE_IPS[0];
     
     // Method to find working IP (runs on background thread)
     public static String findWorkingIP() {
         for (String ip : POSSIBLE_IPS) {
             try {
-                java.net.URL url = new java.net.URL(ip + "/api");
+                java.net.URL url = new java.net.URL(ip + "/health");
                 java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 connection.setConnectTimeout(1000); // 1 second timeout for faster testing
@@ -52,7 +49,7 @@ public final class ApiClient {
     // Simple connection test (non-blocking)
     public static boolean testConnection() {
         try {
-            java.net.URL url = new java.net.URL(BASE_URL + "/api");
+            java.net.URL url = new java.net.URL(BASE_URL + "/health");
             java.net.HttpURLConnection connection = (java.net.HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setConnectTimeout(500); // Very short timeout
@@ -87,6 +84,14 @@ public final class ApiClient {
 
     public static HttpResult patch(String path, String token, String jsonBody) throws Exception {
         return request("PATCH", path, token, jsonBody);
+    }
+
+    public static HttpResult delete(String path, String token) throws Exception {
+        return request("DELETE", path, token, null);
+    }
+
+    public static HttpResult put(String path, String token, String jsonBody) throws Exception {
+        return request("PUT", path, token, jsonBody);
     }
 
     private static HttpResult request(String method, String path, String token, String jsonBody)
