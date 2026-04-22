@@ -15,8 +15,23 @@ app.use(express.json());
 // Routes
 const homeRouter = require('./routes/home');
 const userRouter = require('./routes/user');
+const shiftRouter = require('./routes/shift');
+const swapRouter = require('./routes/swap');
+const leaveRouter = require('./routes/leave');
+const activityRouter = require('./routes/activity');
+const notificationRouter = require('./routes/notification');
+const chatRouter = require('./routes/chat');
+const aiRouter = require('./routes/ai');
+
 app.use('/', homeRouter);
 app.use('/api/users', userRouter);
+app.use('/api/shifts', shiftRouter);
+app.use('/api/swaps', swapRouter);
+app.use('/api/leaves', leaveRouter);
+app.use('/api/activity', activityRouter);
+app.use('/api/notifications', notificationRouter);
+app.use('/api/chat', chatRouter);
+app.use('/api/ai', aiRouter);
 
 // Fallback 404
 app.use((req, res) => {
@@ -39,11 +54,22 @@ const HOST = process.env.HOST || '0.0.0.0';
 
 connectDB()
   .then(() => {
-    app.listen(PORT, HOST, () => {
+    const server = app.listen(PORT, HOST, () => {
       console.log('Server addresses:');      
       console.log(`- Localhost (PC):       http://localhost:${PORT}`);
       console.log(`- Android emulator:     http://10.0.2.2:${PORT}`);
       console.log(`- LAN (physical phone): http://<your-lan-ip>:${PORT}`);
+    });
+
+    server.on('error', (err) => {
+      if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${PORT} is already in use.`);
+        console.error('Either stop the existing server process or change PORT in .env.');
+        process.exit(1);
+      }
+
+      console.error('Server startup error', err);
+      process.exit(1);
     });
   })
   .catch((err) => {

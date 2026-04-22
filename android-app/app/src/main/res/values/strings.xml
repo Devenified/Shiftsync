@@ -1,3 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">verson1</string>
+    <string name="app_name">ShiftSync</string>
+
+    <string name="nav_worker_home">Home</string>
+    <string name="nav_worker_shifts">My shifts</string>
+    <string name="nav_worker_profile">Profile</string>
+
+    <string name="nav_employer_home">Home</string>
+    <string name="nav_employer_shifts">Posted</string>
+    <string name="nav_employer_hire">Hire</string>
+
+    <string name="action_logout">Log out</string>
+    <string name="action_account">Account</string>
+
+    <string name="toolbar_worker">Worker</string>
+    <string name="toolbar_employer">Employer</string>
+
+    <string name="find_open_shifts">Browse open shifts</string>
+    <string name="label_total_earnings">Total earnings</string>
+    <string name="label_availability">Availability</string>
+
+    <string name="employer_card_open">Open shifts</string>
+    <string name="employer_card_network">Workers</string>
+
+    <string name="btn_post_shift">Post new shift</string>
+    <string name="btn_manage_shifts">Manage posted shifts</string>
+    <string name="btn_find_workers">Find workers</string>
+
+    <string name="logout_confirm_title">Log out?</string>
+    <string name="logout_confirm_message">Are you sure you want to log out?</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- Worker Dashboard Strings -->
+    <string name="greeting_hindi">नमस्ते! 👋</string>
+    <string name="available_for_work">Available for work</string>
+    <string name="not_available">Not available</string>
+    <string name="todays_earnings">📊 Today\'s Earnings</string>
+    <string name="this_month">This month: ₹%d</string>
+    <string name="daily_earnings">₹%d</string>
+    <string name="total_earnings">₹%d</string>
+    <string name="currency_symbol">₹</string>
+    <string name="quick_actions">Quick Actions</string>
+    <string name="find_work_emoji">🔍 Find Work</string>
+    <string name="my_shifts_emoji">📅 My Shifts</string>
+    <string name="my_profile_emoji">👤 My Profile</string>
+    <string name="help_emoji">❓ Help</string>
+    <string name="work_status">Work Status</string>
+    <string name="available_today">Available for work today</string>
+    <string name="not_available_today">Not available for work</string>
+    <string name="recent_activity">Recent Activity</string>
+    <string name="no_recent_activity">No recent activity</string>
+    <string name="completed_shifts">✅ Completed %d shift(s)</string>
+    <string name="no_shifts_yet">📋 No shifts completed yet</string>
+    <string name="help_title">Help &amp; Support</string>
+    <string name="help_message">📞 Call us: 1800-123-4567\n\n📧 Email: support@shiftsync.com\n\n💬 We\'re here to help you find work and manage your earnings!</string>
+    <string name="earnings_today_format">₹%d</string>
+    <string name="earnings_month_format">This month: ₹%d</string>
 </resources>

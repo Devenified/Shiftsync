@@ -24,8 +24,27 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".LoginVideoActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".EmployerDashboardActivity" />
+        <activity android:name=".WorkerDashboardActivity" />
+        <activity android:name=".WorkerDashboardNewActivity" />
+        <activity android:name=".WorkerDashboardCleanActivity" />
+        <activity android:name=".WorkerDashboardCompleteActivity" />
+        <activity android:name=".WorkerOpenShiftsActivity" />
+        <activity android:name=".WorkerMyShiftsActivity" />
+        <activity android:name=".WorkerProfileActivity" />
+        <activity android:name=".WorkerProfileEnhancedActivity" />
+        <activity android:name=".EditProfileActivity" />
+        <activity android:name=".EmployerPostShiftActivity" />
+        <activity android:name=".EmployerManageShiftsActivity" />
+        <activity android:name=".EmployerFindWorkersActivity" />
+        <activity android:name=".EmployerProfileActivity" />
+        <activity android:name=".AISkillAdvisorActivity" />
+        <activity android:name=".EmployerAIHelperActivity" />
+        <activity android:name=".PostShiftActivity" />
+        <activity android:name=".RequestSwapActivity" />
+        <activity android:name=".RequestLeaveActivity" />
         <activity android:name=".MainActivity" />
 
     </application>

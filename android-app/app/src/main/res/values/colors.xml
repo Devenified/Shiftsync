@@ -1,38 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Brand Colors -->
-    <color name="brand_primary">#0F172A</color> <!-- Slate 900 -->
-    <color name="brand_secondary">#6366F1</color> <!-- Indigo 500 -->
-    <color name="brand_accent">#10B981</color> <!-- Emerald 500 -->
+    <!-- ========== BRIGHT VIBRANT THEME ========== -->
 
-    <!-- Backgrounds -->
-    <color name="bg_surface">#FFFFFF</color>
-    <color name="bg_main">#F8FAFC</color> <!-- Slate 50 -->
+    <!-- Brand -->
+    <color name="brand_primary">#FF6B35</color>
+    <color name="brand_primary_dark">#E85D2C</color>
+    <color name="brand_secondary">#3B82F6</color>
+    <color name="brand_dark">#FFFFFF</color>
+    <color name="brand_surface">#FFFFFF</color>
+    <color name="brand_white">#FFFFFF</color>
 
-    <!-- Text Colors -->
-    <color name="text_high_emphasis">#1E293B</color> <!-- Slate 800 -->
-    <color name="text_medium_emphasis">#64748B</color> <!-- Slate 500 -->
-    <color name="text_low_emphasis">#94A3B8</color> <!-- Slate 400 -->
-    <color name="text_on_brand">#FFFFFF</color>
+    <!-- Status Colors (vivid) -->
+    <color name="status_success">#22C55E</color>
+    <color name="status_warning">#F59E0B</color>
+    <color name="status_error">#EF4444</color>
+    <color name="status_info">#3B82F6</color>
+    <color name="status_available">#22C55E</color>
+    <color name="status_busy">#EF4444</color>
+    <color name="status_money">#16A34A</color>
 
-    <!-- Support Colors -->
-    <color name="error_red">#EF4444</color>
-    <color name="success_green">#10B981</color>
+    <!-- Backgrounds (light/bright) -->
+    <color name="bg_main">#F0F4FF</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_gradient_start">#F0F4FF</color>
+    <color name="bg_gradient_end">#FFF7ED</color>
+    <color name="bg_light">#F8FAFC</color>
 
-    <!-- Generic -->
-    <color name="black">#000000</color>
-    <color name="white">#FFFFFF</color>
-
-    <!-- UI Component Colors (Restored for linking) -->
-    <color name="card_background">#FFFFFF</color>
-    <color name="hint_text_color">#94A3B8</color>
-    <color name="soft_light_background">#F8FAFC</color>
+    <!-- Text Colors (dark on light) -->
     <color name="text_primary">#1E293B</color>
     <color name="text_secondary">#64748B</color>
+    <color name="text_muted">#94A3B8</color>
+    <color name="text_on_primary">#FFFFFF</color>
+    <color name="text_on_surface">#1E293B</color>
+
+    <!-- Card Colors -->
+    <color name="card_background">#FFFFFF</color>
+    <color name="card_background_light">#FFFFFF</color>
+    <color name="card_border">#E2E8F0</color>
+    <color name="card_border_light">#E2E8F0</color>
+
+    <!-- Interactive Elements -->
+    <color name="button_primary">#FF6B35</color>
+    <color name="button_secondary">#3B82F6</color>
+    <color name="button_outline">#CBD5E1</color>
+    <color name="ripple_color">#33FF6B35</color>
+
+    <!-- Navigation -->
+    <color name="nav_background">#FFFFFF</color>
+    <color name="nav_selected">#FF6B35</color>
+    <color name="nav_unselected">#94A3B8</color>
+
+    <!-- Chat Message Colors -->
+    <color name="user_message_bg">#FF6B35</color>
+    <color name="user_message_text">#FFFFFF</color>
+    <color name="bot_message_bg">#EEF2FF</color>
+    <color name="bot_message_text">#1E293B</color>
+    <color name="error_message_bg">#FEE2E2</color>
+    <color name="error_message_text">#991B1B</color>
+    <color name="system_message_bg">#F1F5F9</color>
+    <color name="system_message_text">#374151</color>
+
+    <!-- UI Elements -->
+    <color name="primary_color">#FF6B35</color>
+    <color name="divider_color">#E2E8F0</color>
+    <color name="light_gray">#F8FAFC</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Shift Types -->
+    <color name="shift_morning">#F59E0B</color>
+    <color name="shift_afternoon">#3B82F6</color>
+    <color name="shift_night">#8B5CF6</color>
+    <color name="shift_off">#94A3B8</color>
+
+    <!-- Premium UI Colors -->
+    <color name="card_background_premium">#FFFFFF</color>
+    <color name="text_primary_premium">#1E293B</color>
+    <color name="text_secondary_premium">#64748B</color>
+    <color name="input_background_premium">#F8FAFC</color>
+    <color name="brand_primary_premium">#FF6B35</color>
+
+    <!-- Compatibility Aliases -->
+    <color name="brand_orange">#FF6B35</color>
+    <color name="brand_surface_dark">#F0F4FF</color>
+    <color name="text_high">#1E293B</color>
+    <color name="text_medium">#64748B</color>
+    <color name="text_low">#94A3B8</color>
+    <color name="text_on_orange">#FFFFFF</color>
+    <color name="hint_text_color">#94A3B8</color>
     <color name="error_text_color">#EF4444</color>
 
-    <!-- Legacy / Theme support -->
-    <color name="colorPrimary">#0F172A</color>
-    <color name="colorPrimaryDark">#020617</color>
-    <color name="colorAccent">#6366F1</color>
+    <!-- Standard Theme Colors -->
+    <color name="colorPrimary">#FF6B35</color>
+    <color name="colorPrimaryDark">#E85D2C</color>
+    <color name="colorAccent">#FF6B35</color>
+    <color name="black">#000000</color>
+
+    <!-- Additional -->
+    <color name="rating_gold">#F59E0B</color>
+    <color name="switch_track_color">#CBD5E1</color>
+    <color name="circle_status_available">#22C55E</color>
+    <color name="circle_status_busy">#EF4444</color>
 </resources>
