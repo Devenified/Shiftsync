@@ -264,6 +264,17 @@ public class WorkerOpenShiftsActivity extends AppCompatActivity {
                 double wage = shift.optDouble("wage", 0);
                 holder.wage.setText("\u20B9" + (int) wage);
 
+                int workersNeeded = Math.max(1, shift.optInt("workersNeeded", 1));
+                int slotsRemaining = shift.optInt("slotsRemaining", workersNeeded);
+                if (holder.slots != null) {
+                    if (workersNeeded > 1) {
+                        holder.slots.setVisibility(View.VISIBLE);
+                        holder.slots.setText(slotsRemaining + " of " + workersNeeded + " slots open");
+                    } else {
+                        holder.slots.setVisibility(View.GONE);
+                    }
+                }
+
                 holder.status.setText("OPEN");
                 holder.status.setBackgroundResource(R.drawable.status_background_open);
 
@@ -316,6 +327,7 @@ public class WorkerOpenShiftsActivity extends AppCompatActivity {
             final TextView wage;
             final TextView status;
             final TextView employerName;
+            final TextView slots;
             final MaterialButton apply;
 
             VH(@NonNull View itemView) {
@@ -328,6 +340,7 @@ public class WorkerOpenShiftsActivity extends AppCompatActivity {
                 wage = itemView.findViewById(R.id.shift_wage);
                 status = itemView.findViewById(R.id.shift_status);
                 employerName = itemView.findViewById(R.id.shift_employer);
+                slots = itemView.findViewById(R.id.shift_slots);
                 apply = itemView.findViewById(R.id.btn_apply);
             }
         }

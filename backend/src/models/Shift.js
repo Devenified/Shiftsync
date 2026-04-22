@@ -15,7 +15,11 @@ const shiftApplicationSchema = new mongoose.Schema(
 const shiftSchema = new mongoose.Schema(
   {
     employer: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    // Legacy single-worker reference. For multi-worker shifts this is the first accepted worker.
     assignedWorker: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    // Full list of accepted workers for multi-slot shifts.
+    assignedWorkers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    workersNeeded: { type: Number, default: 1, min: 1 },
     title: { type: String, required: true, trim: true },
     description: { type: String, trim: true },
     skillRequired: { type: String, required: true, trim: true },
@@ -35,4 +39,3 @@ const shiftSchema = new mongoose.Schema(
 );
 
 module.exports = mongoose.model('Shift', shiftSchema);
-

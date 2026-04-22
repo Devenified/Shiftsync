@@ -54,6 +54,7 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
         TextInputEditText start = findViewById(R.id.start_input);
         TextInputEditText end = findViewById(R.id.end_input);
         TextInputEditText wage = findViewById(R.id.wage_input);
+        TextInputEditText workersNeeded = findViewById(R.id.workers_needed_input);
 
         date.setOnClickListener(v -> {
             Calendar c = Calendar.getInstance();
@@ -81,7 +82,7 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_publish).setOnClickListener(v -> {
             try {
-                publishShift(title, desc, skill, location, date, start, end, wage);
+                publishShift(title, desc, skill, location, date, start, end, wage, workersNeeded);
             } catch (Exception ex) {
                 Toast.makeText(this, "Invalid input", Toast.LENGTH_SHORT).show();
             }
@@ -96,7 +97,8 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
             TextInputEditText dateEt,
             TextInputEditText startEt,
             TextInputEditText endEt,
-            TextInputEditText wageEt
+            TextInputEditText wageEt,
+            TextInputEditText workersNeededEt
     ) throws Exception {
         if (titleEt.getText() == null
                 || skillEt.getText() == null
@@ -124,6 +126,18 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
             return;
         }
 
+        int workersNeededVal = 1;
+        if (workersNeededEt != null && workersNeededEt.getText() != null) {
+            String raw = workersNeededEt.getText().toString().trim();
+            if (!raw.isEmpty()) {
+                try {
+                    workersNeededVal = Math.max(1, Integer.parseInt(raw));
+                } catch (NumberFormatException ignored) {
+                    workersNeededVal = 1;
+                }
+            }
+        }
+
         if (title.isEmpty()
                 || skillRequired.isEmpty()
                 || location.isEmpty()
@@ -143,6 +157,7 @@ public class EmployerPostShiftActivity extends AppCompatActivity {
         body.put("startTime", startTime);
         body.put("endTime", endTime);
         body.put("wage", wageVal);
+        body.put("workersNeeded", workersNeededVal);
 
         progressBar.setVisibility(View.VISIBLE);
         new Thread(() -> {

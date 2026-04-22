@@ -33,15 +33,35 @@
             android:textSize="@dimen/text_body"
             tools:text="Open · Painting · Whitefield" />
 
-        <TextView
-            android:id="@+id/wage"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:textColor="@color/status_money"
-            android:textSize="@dimen/text_money_medium"
-            android:textStyle="bold"
-            tools:text="₹ 600 / day" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/wage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textColor="@color/status_money"
+                android:textSize="@dimen/text_money_medium"
+                android:textStyle="bold"
+                tools:text="₹ 600 / day" />
+
+            <TextView
+                android:id="@+id/slot_progress_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_pill_info"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="4dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/text_caption"
+                android:textStyle="bold"
+                tools:text="1 / 3 slots filled" />
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

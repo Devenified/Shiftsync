@@ -150,6 +150,24 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    private void confirmCompleteShift(String shiftId, String shiftTitle, int paidCount, double wage, int pending) {
+        StringBuilder msg = new StringBuilder();
+        msg.append("This will pay ").append(paidCount)
+                .append(paidCount == 1 ? " worker " : " workers ")
+                .append("\u20B9").append((int) wage).append(" each and close the shift.");
+        if (pending > 0) {
+            msg.append("\n\n").append(pending)
+                    .append(pending == 1 ? " pending applicant " : " pending applicants ")
+                    .append("will be auto-rejected.");
+        }
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Complete \"" + shiftTitle + "\"?")
+                .setMessage(msg.toString())
+                .setPositiveButton("Mark Completed", (d, w) -> completeShift(shiftId))
+                .setNegativeButton("Not yet", null)
+                .show();
+    }
+
     private void completeShift(String shiftId) {
         new Thread(() -> {
             try {
@@ -251,9 +269,42 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
             double wage = shift.optDouble("wage", 0);
             holder.wage.setText("\u20B9" + (int) wage);
 
+            int workersNeeded = Math.max(1, shift.optInt("workersNeeded", 1));
+            int slotsFilled = shift.optInt("slotsFilled", -1);
+            int pendingCount = 0;
+
             holder.applicationsContainer.removeAllViews();
             JSONArray apps = shift.optJSONArray("applications");
             int applicantCount = apps == null ? 0 : apps.length();
+            if (slotsFilled < 0 && apps != null) {
+                int acc = 0;
+                for (int k = 0; k < apps.length(); k++) {
+                    JSONObject a = apps.optJSONObject(k);
+                    if (a != null && "accepted".equals(a.optString("status"))) acc++;
+                }
+                slotsFilled = acc;
+            }
+            if (slotsFilled < 0) slotsFilled = 0;
+            if (apps != null) {
+                for (int k = 0; k < apps.length(); k++) {
+                    JSONObject a = apps.optJSONObject(k);
+                    if (a != null && "pending".equals(a.optString("status"))) pendingCount++;
+                }
+            }
+
+            if (holder.slotProgressLabel != null) {
+                String progressText = slotsFilled + " / " + workersNeeded
+                        + (workersNeeded == 1 ? " slot filled" : " slots filled");
+                holder.slotProgressLabel.setText(progressText);
+                if (slotsFilled >= workersNeeded) {
+                    holder.slotProgressLabel.setBackgroundResource(R.drawable.bg_pill_success);
+                } else if (slotsFilled > 0) {
+                    holder.slotProgressLabel.setBackgroundResource(R.drawable.bg_pill_warning);
+                } else {
+                    holder.slotProgressLabel.setBackgroundResource(R.drawable.bg_pill_info);
+                }
+            }
+
             if (holder.applicantCountLabel != null) {
                 holder.applicantCountLabel.setText(applicantCount == 0
                         ? "No applicants yet"
@@ -334,9 +385,11 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                     final String finalShiftId = shiftId;
                     viewProfile.setOnClickListener(v -> openWorkerProfile(finalWorkerId));
 
+                    int remaining = Math.max(0, workersNeeded - slotsFilled);
                     boolean canReview = "open".equals(status)
                             && "pending".equals(appStatus)
-                            && !finalWorkerId.isEmpty();
+                            && !finalWorkerId.isEmpty()
+                            && remaining > 0;
                     acceptBtn.setVisibility(canReview ? View.VISIBLE : View.GONE);
                     rejectBtn.setVisibility(canReview ? View.VISIBLE : View.GONE);
                     if (canReview) {
@@ -350,11 +403,24 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                 }
             }
 
-            // Show complete button for assigned shifts
-            boolean showComplete = "assigned".equals(status);
+            // Complete button: allowed for assigned, or for open shifts that already
+            // have at least one accepted worker (multi-worker partial-fill early end).
+            boolean showComplete = "assigned".equals(status)
+                    || ("open".equals(status) && slotsFilled > 0);
             holder.complete.setVisibility(showComplete ? View.VISIBLE : View.GONE);
             if (showComplete) {
-                holder.complete.setOnClickListener(v -> completeShift(shiftId));
+                final int finalFilled = slotsFilled;
+                final int finalPending = pendingCount;
+                final String finalShiftIdForComplete = shiftId;
+                final String finalTitle = title;
+                final double finalWage = wage;
+                if ("open".equals(status) && slotsFilled < workersNeeded) {
+                    holder.complete.setText("End Early (" + finalFilled + "/" + workersNeeded + ")");
+                } else {
+                    holder.complete.setText("Complete Shift");
+                }
+                holder.complete.setOnClickListener(v -> confirmCompleteShift(
+                        finalShiftIdForComplete, finalTitle, finalFilled, finalWage, finalPending));
             }
 
             // Show cancel button for open or assigned shifts
@@ -375,6 +441,7 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
             final TextView meta;
             final TextView wage;
             final TextView applicantCountLabel;
+            final TextView slotProgressLabel;
             final LinearLayout applicationsContainer;
             final Button complete;
             final Button cancel;
@@ -385,6 +452,7 @@ public class EmployerManageShiftsActivity extends AppCompatActivity {
                 meta = itemView.findViewById(R.id.meta);
                 wage = itemView.findViewById(R.id.wage);
                 applicantCountLabel = itemView.findViewById(R.id.applicant_count_label);
+                slotProgressLabel = itemView.findViewById(R.id.slot_progress_label);
                 applicationsContainer = itemView.findViewById(R.id.applications_container);
                 complete = itemView.findViewById(R.id.btn_complete);
                 cancel = itemView.findViewById(R.id.btn_cancel);
